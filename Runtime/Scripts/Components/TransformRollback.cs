@@ -34,4 +34,7 @@ public class TransformRollback : RollbackElement {
         rotations.RemoveAt(rotations.Count - 1);
         totalSavedFrame = positions.Count;
     }
+
+    public override void Simulate() {
+    }
 }

@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace EZRollback.Core {
-
-    [Serializable]
+[Serializable]
     public class RollbackComponent : MonoBehaviour
     {
         [SerializeField] public List<string> rollbackedComponentsName = new List<string>();
         [SerializeField] public List<bool> doRollbackComponents = new List<bool>();
-
+        
         [SerializeField] List<RollbackElement> elementsToRollback;
         
         void Start() {
@@ -17,6 +16,9 @@ namespace EZRollback.Core {
             
             for(int i = 0; i < rollbackedComponentsName.Count; i++){
                 if (doRollbackComponents[i]) {
+                    Type t = Type.GetType(rollbackedComponentsName[i]);
+                    t newObj = new t();
+                    
                     switch (rollbackedComponentsName[i]) {
                         case "UnityEngine.Transform":
                             TransformRollback transformRollback = new TransformRollback();
@@ -33,8 +35,7 @@ namespace EZRollback.Core {
                             PlayerMovementRollback playerMovementRollback = new PlayerMovementRollback();
                             playerMovementRollback.Init(gameObject);
                             elementsToRollback.Add(playerMovementRollback);
-                            break;
-                            */
+                            break;*/
                     }
                 }
             }
@@ -53,6 +54,12 @@ namespace EZRollback.Core {
         public void GoToFrame(int frameNumber, bool deleteFrames) {
             foreach (RollbackElement rbElement in elementsToRollback) {
                 rbElement.GoToFrame(frameNumber, deleteFrames);
+            }
+        }
+
+        public void Simulate() {
+            foreach (RollbackElement rbElement in elementsToRollback) {
+                rbElement.Simulate();
             }
         }
     }

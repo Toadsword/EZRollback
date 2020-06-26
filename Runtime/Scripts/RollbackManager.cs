@@ -31,6 +31,14 @@ namespace EZRollback.Core {
             }
         }
 
+        private void SetCurrentFrameAsLastRegistered() {
+            if (currentFrameNum != maxFrameNum) {
+                foreach (RollbackComponent rollbackElement in rollbackElements) {
+                    rollbackElement.GoToFrame(currentFrameNum, true);
+                }
+            }
+        }
+        
         public void GoToFrame(int frameNumber, bool deleteFrames = true) {
             if (maxFrameNum < frameNumber)
                 return;
@@ -48,11 +56,7 @@ namespace EZRollback.Core {
 
         public void SaveCurrentFrame() {
             //If we try to save a frame while in restored state, we delete the first predicted future
-            if (currentFrameNum != maxFrameNum) {
-                foreach (RollbackComponent rollbackElement in rollbackElements) {
-                    rollbackElement.GoToFrame(currentFrameNum, true);
-                }
-            }
+            SetCurrentFrameAsLastRegistered();
 
             foreach (RollbackComponent rollbackElement in rollbackElements) {
                 rollbackElement.SaveCurrentFrame();
@@ -60,6 +64,23 @@ namespace EZRollback.Core {
 
             currentFrameNum++;
             maxFrameNum = currentFrameNum;
+        }
+
+        // From the currently loaded frame, simutate x frames by calling fixed update on all the rollbackElements
+        public void Simulate(int numFrames) {
+            
+            Debug.Log("Simulate !");
+            Debug.Log("numFrames : " + numFrames.ToString());
+            SetCurrentFrameAsLastRegistered();
+
+            for (int i = 0; i < numFrames; i++) {
+                Debug.Log(i);
+                foreach (RollbackComponent rollbackElement in rollbackElements) {
+                    rollbackElement.Simulate();
+                    rollbackElement.SaveCurrentFrame();
+                }
+            }
+            Debug.Log("End Simulate !");
         }
     }
 }

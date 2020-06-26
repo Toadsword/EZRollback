@@ -25,4 +25,8 @@ public class SpriteRendererRollback : RollbackElement {
         _colors.RemoveAt(frameNumber - 1);
         totalSavedFrame = _colors.Count;
     }
+
+    public override void Simulate() {
+        
+    }
 }

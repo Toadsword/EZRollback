@@ -13,6 +13,8 @@ namespace Packages.EZRollback.Editor {
         
         bool openedObjectList = false;
         int currentWantedSize = 0;
+
+        int numFramesToSimulate = 0;
         
         [MenuItem("RollbackTool/Information")]
         public static void ShowWindow() {
@@ -29,6 +31,8 @@ namespace Packages.EZRollback.Editor {
             DisplayRollbackEditionButtons();
 
             DisplayInformations();
+
+            DisplaySimulateOptions();
             
             DisplayAllRollbackEntities();
         }
@@ -115,7 +119,18 @@ namespace Packages.EZRollback.Editor {
                 GUILayout.Label("Current frame number : " + _rollbackManager.GetCurrentFrameNum() + " / " + _rollbackManager.GetMaxFramesNum());
             }
         }
-        
+
+        private void DisplaySimulateOptions() {
+            
+            EditorGUILayout.BeginHorizontal();
+            numFramesToSimulate = EditorGUILayout.IntField(numFramesToSimulate, "Num frame to simulate");
+            if (GUILayout.Button("Simulate !")) {
+                if (_rollbackManager != null) {
+                    _rollbackManager.Simulate(numFramesToSimulate);
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+        }
         private void DisplayAllRollbackEntities() {
             openedObjectList = EditorGUILayout.Foldout(openedObjectList, "Rollback object list");
             if (openedObjectList) {

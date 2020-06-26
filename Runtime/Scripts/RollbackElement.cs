@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
+[Serializable]
 public abstract class RollbackElement{
     protected int totalSavedFrame = 0;
 
@@ -30,4 +32,6 @@ public abstract class RollbackElement{
     }
     
     protected abstract void DeleteFrame(int frameNumber);
+
+    public abstract void Simulate();
 }
