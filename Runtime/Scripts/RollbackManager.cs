@@ -1,12 +1,18 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace EZRollback.Core {
     public class RollbackManager : MonoBehaviour {
         public bool doRollback = false;
+        
+        public Action simulateDelegate;
+        public Action saveDelegate;
+        public Action<int> goToFrameDelegate;
+        public Action<int, int> deleteFramesDelegate;
 
-        [SerializeField] RollbackComponent[] rollbackElements;
-        int maxFrameNum = 0;
-        int currentFrameNum = 0;
+        [SerializeField] int maxFrameNum = 0;
+        [SerializeField] int currentFrameNum = 0;
 
         public int GetCurrentFrameNum() {
             return currentFrameNum;
@@ -18,8 +24,17 @@ namespace EZRollback.Core {
 
         // Start is called before the first frame update
         void Start() {
-            rollbackElements = GameObject.FindObjectsOfType<RollbackComponent>();
+            IRollbackBehaviour[] rbBehaviours = GameObject.FindObjectsOfType<IRollbackBehaviour>();
+
+            foreach (IRollbackBehaviour rbBehaviour in rbBehaviours) {
+                simulateDelegate += rbBehaviour.Simulate;
+                saveDelegate += rbBehaviour.SaveFrame;
+                goToFrameDelegate += rbBehaviour.GoToFrame;
+                deleteFramesDelegate += rbBehaviour.DeleteFrames;
+            }
+            
             currentFrameNum = 0;
+            maxFrameNum = 0;
         }
 
         // Update is called once per frame
@@ -27,25 +42,25 @@ namespace EZRollback.Core {
             if (doRollback) {
                 GoToFrame(currentFrameNum - 1);
             } else {
-                SaveCurrentFrame();
+                Simulate(1);
             }
         }
 
         private void SetCurrentFrameAsLastRegistered() {
             if (currentFrameNum != maxFrameNum) {
-                foreach (RollbackComponent rollbackElement in rollbackElements) {
-                    rollbackElement.GoToFrame(currentFrameNum, true);
-                }
+                //Apply set
+                deleteFramesDelegate.Invoke(currentFrameNum, maxFrameNum);
+                maxFrameNum = currentFrameNum;
             }
         }
         
         public void GoToFrame(int frameNumber, bool deleteFrames = true) {
-            if (maxFrameNum < frameNumber)
+            
+            if (maxFrameNum < frameNumber || frameNumber < 0)
                 return;
-
-            foreach (RollbackComponent rollbackElement in rollbackElements) {
-                rollbackElement.GoToFrame(currentFrameNum, deleteFrames);
-            }
+            
+            //Apply Goto
+            goToFrameDelegate.Invoke(frameNumber);
 
             currentFrameNum = frameNumber;
             if (deleteFrames) {
@@ -58,29 +73,22 @@ namespace EZRollback.Core {
             //If we try to save a frame while in restored state, we delete the first predicted future
             SetCurrentFrameAsLastRegistered();
 
-            foreach (RollbackComponent rollbackElement in rollbackElements) {
-                rollbackElement.SaveCurrentFrame();
-            }
-
+            //Apply save
+            saveDelegate.Invoke();
+            
             currentFrameNum++;
             maxFrameNum = currentFrameNum;
         }
 
         // From the currently loaded frame, simutate x frames by calling fixed update on all the rollbackElements
         public void Simulate(int numFrames) {
-            
-            Debug.Log("Simulate !");
-            Debug.Log("numFrames : " + numFrames.ToString());
             SetCurrentFrameAsLastRegistered();
 
             for (int i = 0; i < numFrames; i++) {
-                Debug.Log(i);
-                foreach (RollbackComponent rollbackElement in rollbackElements) {
-                    rollbackElement.Simulate();
-                    rollbackElement.SaveCurrentFrame();
-                }
+                //Apply simulate and save for each frames
+                simulateDelegate.Invoke();
+                SaveCurrentFrame();
             }
-            Debug.Log("End Simulate !");
         }
     }
 }

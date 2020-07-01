@@ -1,37 +1,74 @@
-﻿using System;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public abstract class RollbackElement{
-    protected int totalSavedFrame = 0;
+public class RollbackElement<T> {
 
-    public abstract void Init(GameObject gameObject);
+    List<T> elements = new List<T>();
+
+    public T value;
     
-    // Start is called before the first frame update
-    public abstract void SaveFrame();
+    int _currentLoadedFrame = 0; 
+    int _totalSavedFrame = 0;
 
-    public void GoToFrame(int frameNumber, bool deleteFrames) {
-        if (totalSavedFrame < frameNumber) {
+    public RollbackElement() {
+        value = default;
+        elements = new List<T>();
+        
+        _currentLoadedFrame = 0;
+        _totalSavedFrame = 0;
+    }
+    
+    public RollbackElement(T initValue) {
+        value = initValue;
+        elements = new List<T>();
+    }
+    
+    public void Clear() {
+        elements.Clear();
+    }
+
+    public T GetValue(int frameNum) {
+        if (frameNum < _totalSavedFrame) {
+            return elements[frameNum];
+        }
+
+        return default;
+    }
+
+    public void SetAndSaveValue(T newValue) {
+        value = newValue;
+        SaveFrame();
+    }
+
+    public void SaveFrame() {
+        elements.Add(value);
+        
+        _totalSavedFrame++;
+        _currentLoadedFrame = _totalSavedFrame;
+    }
+
+    public void SetValueFromFrameNumber(int frameNum) {
+        if (_totalSavedFrame < frameNum && frameNum < 0) {
             Debug.LogError("Cannot go back from higher number of registered frames");
             return;
         }
         
-        GoToFrame(frameNumber);
-        
-        if (deleteFrames) {
-            DeleteFrames(totalSavedFrame, frameNumber);
-        }
+        value = elements[frameNum];
+        _currentLoadedFrame = frameNum;
     }
 
-    protected abstract void GoToFrame(int frameNumber);
-
-    private void DeleteFrames(int fromFrameNumber, int toFrameNumber) {
-        for (int i = toFrameNumber; i > fromFrameNumber; i--) {
-            DeleteFrame(i);
-        }
+    public void DeleteFirstFrames(int numFrames) {
+        DeleteFrames(0, numFrames);
     }
     
-    protected abstract void DeleteFrame(int frameNumber);
+    public void ResetFramesToNum(int fromFrameNum) {
+        DeleteFrames(fromFrameNum, elements.Count - fromFrameNum);
+    }
 
-    public abstract void Simulate();
+    public void DeleteFrames(int fromFrameNumber, int numFramesToDelete) {
+        for (int i = 0; i > numFramesToDelete; i++) {
+            elements.RemoveAt(fromFrameNumber + 1);
+        }
+    }
 }

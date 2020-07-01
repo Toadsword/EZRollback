@@ -9,6 +9,7 @@ using UnityEngine;
 namespace EZRollback.Core {
     [CustomEditor(typeof(RollbackComponent))]
     public class RollbackComponentInspector : Editor {
+        /*
         RollbackComponent _rollbackComponent;
         
         void OnSceneGUI() {
@@ -98,6 +99,6 @@ namespace EZRollback.Core {
             if (_rollbackComponent.doRollbackComponents.Count != wantedSize) {
                 RefreshComponentList();
             }
-        }
+        }*/
     }
 }
