@@ -1,12 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class RollbackElement<T> {
 
-    List<T> elements = new List<T>();
+    [SerializeField] List<T> elements = new List<T>();
 
-    public T value;
+    [SerializeField] public T value;
     
     int _currentLoadedFrame = 0; 
     int _totalSavedFrame = 0;
@@ -58,17 +60,9 @@ public class RollbackElement<T> {
         _currentLoadedFrame = frameNum;
     }
 
-    public void DeleteFirstFrames(int numFrames) {
-        DeleteFrames(0, numFrames);
-    }
-    
-    public void ResetFramesToNum(int fromFrameNum) {
-        DeleteFrames(fromFrameNum, elements.Count - fromFrameNum);
-    }
-
     public void DeleteFrames(int fromFrameNumber, int numFramesToDelete) {
-        for (int i = 0; i > numFramesToDelete; i++) {
-            elements.RemoveAt(fromFrameNumber + 1);
+        for (int i = 0; i < numFramesToDelete; i++) {
+            elements.RemoveAt(fromFrameNumber);
         }
     }
 }

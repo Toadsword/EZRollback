@@ -5,6 +5,7 @@ using UnityEngine;
 namespace EZRollback.Core {
     public class RollbackManager : MonoBehaviour {
         public bool doRollback = false;
+        public bool bufferRestriction = false;
         
         public Action simulateDelegate;
         public Action saveDelegate;
@@ -14,6 +15,8 @@ namespace EZRollback.Core {
         [SerializeField] int maxFrameNum = 0;
         [SerializeField] int currentFrameNum = 0;
 
+        [SerializeField] int bufferSize = -1;
+        
         public int GetCurrentFrameNum() {
             return currentFrameNum;
         }
@@ -27,14 +30,18 @@ namespace EZRollback.Core {
             IRollbackBehaviour[] rbBehaviours = GameObject.FindObjectsOfType<IRollbackBehaviour>();
 
             foreach (IRollbackBehaviour rbBehaviour in rbBehaviours) {
-                simulateDelegate += rbBehaviour.Simulate;
-                saveDelegate += rbBehaviour.SaveFrame;
-                goToFrameDelegate += rbBehaviour.GoToFrame;
-                deleteFramesDelegate += rbBehaviour.DeleteFrames;
+                RegisterNewRollbakcBehaviour(rbBehaviour);
             }
             
             currentFrameNum = 0;
             maxFrameNum = 0;
+        }
+
+        public void RegisterNewRollbakcBehaviour(IRollbackBehaviour rbBehaviour) {
+            simulateDelegate += rbBehaviour.Simulate;
+            saveDelegate += rbBehaviour.SaveFrame;
+            goToFrameDelegate += rbBehaviour.GoToFrame;
+            deleteFramesDelegate += rbBehaviour.DeleteFrames;
         }
 
         // Update is called once per frame
@@ -43,6 +50,9 @@ namespace EZRollback.Core {
                 GoToFrame(currentFrameNum - 1);
             } else {
                 Simulate(1);
+                if (bufferRestriction) {
+                    ManageBufferSize();
+                }
             }
         }
 
@@ -88,6 +98,15 @@ namespace EZRollback.Core {
                 //Apply simulate and save for each frames
                 simulateDelegate.Invoke();
                 SaveCurrentFrame();
+            }
+        }
+
+        private void ManageBufferSize() {
+            if (bufferSize > 0 && maxFrameNum > bufferSize) {
+                deleteFramesDelegate.Invoke(0, maxFrameNum - bufferSize);
+
+                maxFrameNum = bufferSize;
+                currentFrameNum = maxFrameNum;
             }
         }
     }

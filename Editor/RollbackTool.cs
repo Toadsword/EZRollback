@@ -111,7 +111,9 @@ namespace Packages.EZRollback.Editor {
         private void DisplaySimulateOptions() {
             
             EditorGUILayout.BeginHorizontal();
-            numFramesToSimulate = EditorGUILayout.IntField(numFramesToSimulate, "Num frame to simulate");
+            numFramesToSimulate = EditorGUILayout.IntField("Num frames to simulate : ", numFramesToSimulate);
+            if (numFramesToSimulate < 0)
+                numFramesToSimulate = 0;
             if (GUILayout.Button("Simulate !")) {
                 if (_rollbackManager != null) {
                     _rollbackManager.Simulate(numFramesToSimulate);
