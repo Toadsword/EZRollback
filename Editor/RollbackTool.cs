@@ -95,7 +95,7 @@ namespace Packages.EZRollback.Editor {
                 EditorGUILayout.BeginHorizontal();
 
                 GUILayout.Label("CurrentFrame", GUILayout.Width(100));
-                int newFrameNum = (int)GUILayout.HorizontalSlider(_rollbackManager.GetCurrentFrameNum(), 1, _rollbackManager.GetMaxFramesNum());
+                int newFrameNum = (int)GUILayout.HorizontalSlider(_rollbackManager.GetCurrentFrameNum(), 1, (_rollbackManager.GetMaxFramesNum() - 1));
 
                 if (newFrameNum != _rollbackManager.GetCurrentFrameNum()) {
                     _rollbackManager.GoToFrame(newFrameNum, false);
@@ -104,7 +104,7 @@ namespace Packages.EZRollback.Editor {
 
                 EditorGUILayout.EndHorizontal();
             
-                GUILayout.Label("Current frame number : " + _rollbackManager.GetCurrentFrameNum() + " / " + _rollbackManager.GetMaxFramesNum());
+                GUILayout.Label("Current frame number : " + (_rollbackManager.GetCurrentFrameNum() - 1) + " / " + (_rollbackManager.GetMaxFramesNum() - 1));
             }
         }
 

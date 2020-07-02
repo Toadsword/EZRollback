@@ -60,7 +60,7 @@ namespace EZRollback.Core {
         private void SetCurrentFrameAsLastRegistered() {
             if (currentFrameNum != maxFrameNum) {
                 //Apply set
-                deleteFramesDelegate.Invoke(currentFrameNum, maxFrameNum);
+                deleteFramesDelegate.Invoke(currentFrameNum, maxFrameNum - currentFrameNum);
                 maxFrameNum = currentFrameNum;
             }
         }
@@ -75,6 +75,7 @@ namespace EZRollback.Core {
 
             currentFrameNum = frameNumber;
             if (deleteFrames) {
+                SetCurrentFrameAsLastRegistered();
                 maxFrameNum = currentFrameNum;
             }
         }
