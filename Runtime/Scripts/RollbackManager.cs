@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using EZRollback.Core.Component;
 using UnityEngine;
 
 namespace EZRollback.Core {
