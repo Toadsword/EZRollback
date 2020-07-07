@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Packages.EZRollback.Runtime.Scripts;
 using UnityEngine;
 
 namespace EZRollback.Core.Component {
-public class TransformRollback : IRollbackBehaviour {
+public class PositionRollback : IRollbackBehaviour {
     [SerializeField] private RollbackElement<Vector3> positionRB = new RollbackElement<Vector3>();
 
     public override void Simulate() {
@@ -14,8 +15,8 @@ public class TransformRollback : IRollbackBehaviour {
         transform.position = positionRB.value;
     }
 
-    public override void DeleteFrames(int fromFrame, int numFramesToDelete) {
-        positionRB.DeleteFrames(fromFrame, numFramesToDelete);
+    public override void DeleteFrames(int numFramesToDelete, bool firstFrames) {
+        positionRB.DeleteFrames(numFramesToDelete, firstFrames);
     }
 
     public override void SaveFrame() {

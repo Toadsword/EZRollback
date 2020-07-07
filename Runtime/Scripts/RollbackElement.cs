@@ -1,38 +1,40 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+namespace Packages.EZRollback.Runtime.Scripts {
 [Serializable]
 public class RollbackElement<T> {
-
-    [SerializeField] List<T> elements = new List<T>();
+    const int DEFAULT_SIZE = 51;
+    
+    //[SerializeField] List<T> elements = new List<T>();
+    [SerializeField] T[] elements;
 
     [SerializeField] public T value;
     
-    int _currentLoadedFrame = 0; 
-    int _totalSavedFrame = 0;
+    [SerializeField] int _head = 0;
+    [SerializeField] int _tail = 0;
+    [SerializeField] int _size = 0;
 
-    public RollbackElement() {
-        value = default;
-        elements = new List<T>();
-        
-        _currentLoadedFrame = 0;
-        _totalSavedFrame = 0;
+    public RollbackElement(T initValue = default, int baseSize = DEFAULT_SIZE) {
+        InitializeRollbackElement(initValue, baseSize);
     }
-    
-    public RollbackElement(T initValue) {
+
+    private void InitializeRollbackElement(T initValue, int baseSize) {
         value = initValue;
-        elements = new List<T>();
+        elements = new T[baseSize];
+
+        Clear();
     }
     
     public void Clear() {
-        elements.Clear();
+        _head = 0;
+        _tail = 0;
+        _size = 0;
     }
 
     public T GetValue(int frameNum) {
-        if (frameNum < _totalSavedFrame) {
-            return elements[frameNum];
+        if (frameNum < _size) {
+            return elements[(_tail + frameNum) % elements.Length];
         }
 
         return default;
@@ -44,25 +46,66 @@ public class RollbackElement<T> {
     }
 
     public void SaveFrame() {
-        elements.Add(value);
+        elements[_head] = value;
+
+        _head++;
+        _size++;
         
-        _totalSavedFrame++;
-        _currentLoadedFrame = _totalSavedFrame;
+        CheckArraySize();
     }
 
     public void SetValueFromFrameNumber(int frameNum) {
-        if (_totalSavedFrame < frameNum && frameNum < 0) {
+        if (_size < frameNum && frameNum < 0) {
             Debug.LogError("Cannot go back from higher number of registered frames");
             return;
         }
         
-        value = elements[frameNum];
-        _currentLoadedFrame = frameNum;
+        value = elements[(_tail + frameNum) % elements.Length];
     }
+    
+    public void DeleteFrames(int numFramesToDelete, bool firstFrames) {
+        if (firstFrames) {
+            _tail += numFramesToDelete;
+            _tail = _tail % elements.Length;
+        } else {
+            _head -= numFramesToDelete;
+            if (_head < 0) {
+                _head += elements.Length;
+            }
+        }
 
-    public void DeleteFrames(int fromFrameNumber, int numFramesToDelete) {
-        for (int i = 0; i < numFramesToDelete; i++) {
-            elements.RemoveAt(fromFrameNumber);
+        _size -= numFramesToDelete;
+
+        //That means we deleted all the frames
+        if (_size <= 0) {
+            _size = 0;
+            _head = 0;
+            _tail = 0;
         }
     }
+
+    private void CheckArraySize() {
+        _head = _head % elements.Length;
+
+        if (_head == _tail && _size == elements.Length) {
+            Resize(elements.Length * 2);
+        }
+    }
+
+    private void Resize(int newSize) {
+        int currentSize = elements.Length;
+        
+        T[] oldElements = elements;
+        elements = new T[newSize];
+
+        //For each element of the previous buffer
+        for (int i = 0; i < _size; i++) {
+            elements[i] = oldElements[( _tail + i) % currentSize];
+        }
+
+        _tail = 0;
+        _head = currentSize;
+        _size = currentSize;
+    }
+}
 }

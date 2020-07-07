@@ -5,11 +5,12 @@ namespace EZRollback.Core.Component {
     [Serializable]
     public abstract class IRollbackBehaviour : MonoBehaviour {
 
+        //Work instead of FixedUpdate
         public abstract void Simulate();
 
         public abstract void GoToFrame(int frameNumber);
 
-        public abstract void DeleteFrames(int fromFrame, int numFramesToDelete);
+        public abstract void DeleteFrames(int numFramesToDelete, bool firstFrames);
 
         public abstract void SaveFrame();
     }

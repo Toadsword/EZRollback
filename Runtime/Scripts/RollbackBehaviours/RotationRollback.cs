@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Packages.EZRollback.Runtime.Scripts;
 using UnityEngine;
 
 
@@ -15,8 +16,8 @@ public class RotationRollback : IRollbackBehaviour {
         transform.rotation = rotationRB.value;
     }
 
-    public override void DeleteFrames(int fromFrame, int numFramesToDelete) {
-        rotationRB.DeleteFrames(fromFrame, numFramesToDelete);
+    public override void DeleteFrames(int numFramesToDelete, bool firstFrames) {
+        rotationRB.DeleteFrames(numFramesToDelete, firstFrames);
     }
 
     public override void SaveFrame() {

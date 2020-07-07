@@ -4,6 +4,7 @@ using EZRollback.Core.Component;
 using UnityEngine;
 
 namespace EZRollback.Core {
+
     public class RollbackManager : MonoBehaviour {
         public bool doRollback = false;
         public bool bufferRestriction = false;
@@ -11,13 +12,13 @@ namespace EZRollback.Core {
         public Action simulateDelegate;
         public Action saveDelegate;
         public Action<int> goToFrameDelegate;
-        public Action<int, int> deleteFramesDelegate;
+        public Action<int, bool> deleteFramesDelegate;
 
         [SerializeField] int maxFrameNum = 0;
         [SerializeField] int currentFrameNum = 0;
 
         [SerializeField] int bufferSize = -1;
-        
+
         public int GetCurrentFrameNum() {
             return currentFrameNum;
         }
@@ -60,7 +61,7 @@ namespace EZRollback.Core {
         private void SetCurrentFrameAsLastRegistered() {
             if (currentFrameNum != maxFrameNum) {
                 //Apply set
-                deleteFramesDelegate.Invoke(currentFrameNum, maxFrameNum - currentFrameNum);
+                deleteFramesDelegate.Invoke(maxFrameNum - currentFrameNum, false);
                 maxFrameNum = currentFrameNum;
             }
         }
@@ -105,7 +106,7 @@ namespace EZRollback.Core {
 
         private void ManageBufferSize() {
             if (bufferSize > 0 && maxFrameNum > bufferSize) {
-                deleteFramesDelegate.Invoke(0, maxFrameNum - bufferSize);
+                deleteFramesDelegate.Invoke(1, true);
 
                 maxFrameNum = bufferSize;
                 currentFrameNum = maxFrameNum;
