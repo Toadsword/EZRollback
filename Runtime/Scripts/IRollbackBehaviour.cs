@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace EZRollback.Core.Component {
+namespace Packages.EZRollback.Runtime.Scripts {
     [Serializable]
     public abstract class IRollbackBehaviour : MonoBehaviour {
 

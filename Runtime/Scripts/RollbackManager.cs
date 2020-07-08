@@ -1,55 +1,80 @@
 ﻿using System;
-using System.Collections.Generic;
-using EZRollback.Core.Component;
 using UnityEngine;
 
-namespace EZRollback.Core {
+namespace Packages.EZRollback.Runtime.Scripts {
 
     public class RollbackManager : MonoBehaviour {
         public bool doRollback = false;
         public bool bufferRestriction = false;
+        
+        public Action prepareInputDelegate;
         
         public Action simulateDelegate;
         public Action saveDelegate;
         public Action<int> goToFrameDelegate;
         public Action<int, bool> deleteFramesDelegate;
 
-        [SerializeField] int maxFrameNum = 0;
-        [SerializeField] int currentFrameNum = 0;
+        public static InputQueue inputQueue;
+        
+        [SerializeField] int _maxFrameNum = 0;
+        [SerializeField] int _displayedFrameNum = 0;
 
         [SerializeField] int bufferSize = -1;
 
-        public int GetCurrentFrameNum() {
-            return currentFrameNum;
+        public int GetDisplayedFrameNum() {
+            return _displayedFrameNum;
         }
 
         public int GetMaxFramesNum() {
-            return maxFrameNum;
+            return _maxFrameNum;
+        }
+
+
+        IRollbackBehaviour[] _rbRegisteredBehaviours;
+        void OnEnable() {
+            inputQueue = GetComponent<InputQueue>();
+            
+            _rbRegisteredBehaviours = GameObject.FindObjectsOfType<IRollbackBehaviour>();
+
+            foreach (IRollbackBehaviour rbBehaviour in _rbRegisteredBehaviours) {
+                simulateDelegate += rbBehaviour.Simulate;
+                saveDelegate += rbBehaviour.SaveFrame;
+                goToFrameDelegate += rbBehaviour.GoToFrame;
+                deleteFramesDelegate += rbBehaviour.DeleteFrames;
+            }
+            
+            prepareInputDelegate += inputQueue.PrepareInput;
+            saveDelegate += inputQueue.SaveFrame;
+            goToFrameDelegate += inputQueue.GoToFrame;
+            deleteFramesDelegate += inputQueue.DeleteFrames;
+        }
+
+        void OnDisable() {
+            foreach (IRollbackBehaviour rbBehaviour in _rbRegisteredBehaviours) {
+                simulateDelegate -= rbBehaviour.Simulate;
+                saveDelegate -= rbBehaviour.SaveFrame;
+                goToFrameDelegate -= rbBehaviour.GoToFrame;
+                deleteFramesDelegate -= rbBehaviour.DeleteFrames;
+            }
+            _rbRegisteredBehaviours = new IRollbackBehaviour[]{};
+            
+            prepareInputDelegate -= inputQueue.PrepareInput;
+            saveDelegate -= inputQueue.SaveFrame;
+            goToFrameDelegate -= inputQueue.GoToFrame;
+            deleteFramesDelegate -= inputQueue.DeleteFrames;
         }
 
         // Start is called before the first frame update
         void Start() {
-            IRollbackBehaviour[] rbBehaviours = GameObject.FindObjectsOfType<IRollbackBehaviour>();
-
-            foreach (IRollbackBehaviour rbBehaviour in rbBehaviours) {
-                RegisterNewRollbakcBehaviour(rbBehaviour);
-            }
             
-            currentFrameNum = 0;
-            maxFrameNum = 0;
-        }
-
-        public void RegisterNewRollbakcBehaviour(IRollbackBehaviour rbBehaviour) {
-            simulateDelegate += rbBehaviour.Simulate;
-            saveDelegate += rbBehaviour.SaveFrame;
-            goToFrameDelegate += rbBehaviour.GoToFrame;
-            deleteFramesDelegate += rbBehaviour.DeleteFrames;
+            _displayedFrameNum = 0;
+            _maxFrameNum = 0;
         }
 
         // Update is called once per frame
         void FixedUpdate() {
             if (doRollback) {
-                GoToFrame(currentFrameNum - 1);
+                GoToFrame(_displayedFrameNum - 1);
             } else {
                 Simulate(1);
                 if (bufferRestriction) {
@@ -59,25 +84,25 @@ namespace EZRollback.Core {
         }
 
         private void SetCurrentFrameAsLastRegistered() {
-            if (currentFrameNum != maxFrameNum) {
+            if (_displayedFrameNum != _maxFrameNum) {
                 //Apply set
-                deleteFramesDelegate.Invoke(maxFrameNum - currentFrameNum, false);
-                maxFrameNum = currentFrameNum;
+                deleteFramesDelegate.Invoke(_maxFrameNum - _displayedFrameNum, false);
+                _maxFrameNum = _displayedFrameNum;
             }
         }
         
         public void GoToFrame(int frameNumber, bool deleteFrames = true) {
             
-            if (maxFrameNum < frameNumber || frameNumber < 0)
+            if (_maxFrameNum < frameNumber || frameNumber < 0)
                 return;
             
             //Apply Goto
             goToFrameDelegate.Invoke(frameNumber);
 
-            currentFrameNum = frameNumber;
+            _displayedFrameNum = frameNumber;
             if (deleteFrames) {
                 SetCurrentFrameAsLastRegistered();
-                maxFrameNum = currentFrameNum;
+                _maxFrameNum = _displayedFrameNum;
             }
         }
 
@@ -89,8 +114,8 @@ namespace EZRollback.Core {
             //Apply save
             saveDelegate.Invoke();
             
-            currentFrameNum++;
-            maxFrameNum = currentFrameNum;
+            _displayedFrameNum++;
+            _maxFrameNum = _displayedFrameNum;
         }
 
         // From the currently loaded frame, simutate x frames by calling fixed update on all the rollbackElements
@@ -99,17 +124,18 @@ namespace EZRollback.Core {
 
             for (int i = 0; i < numFrames; i++) {
                 //Apply simulate and save for each frames
+                prepareInputDelegate.Invoke();
                 simulateDelegate.Invoke();
                 SaveCurrentFrame();
             }
         }
 
         private void ManageBufferSize() {
-            if (bufferSize > 0 && maxFrameNum > bufferSize) {
+            if (bufferSize > 0 && _maxFrameNum > bufferSize) {
                 deleteFramesDelegate.Invoke(1, true);
 
-                maxFrameNum = bufferSize;
-                currentFrameNum = maxFrameNum;
+                _maxFrameNum = bufferSize;
+                _displayedFrameNum = _maxFrameNum;
             }
         }
     }

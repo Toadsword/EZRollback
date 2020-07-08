@@ -1,5 +1,4 @@
 ﻿using System;
-using EZRollback.Core;
 using Packages.EZRollback.Runtime.Scripts;
 using UnityEditor;
 using UnityEngine;
@@ -54,7 +53,7 @@ namespace Packages.EZRollback.Editor {
             }
             
             if (GUILayout.Button("<", GUILayout.Width(30), GUILayout.Height(20))) {
-                _rollbackManager.GoToFrame(_rollbackManager.GetCurrentFrameNum() - 1, false);
+                _rollbackManager.GoToFrame(_rollbackManager.GetDisplayedFrameNum() - 1, false);
                 UnityEditor.EditorApplication.isPaused = true;
             }
 
@@ -70,7 +69,7 @@ namespace Packages.EZRollback.Editor {
 
             if (UnityEditor.EditorApplication.isPaused) {
                 if (GUILayout.Button("Resume", GUILayout.Width(100), GUILayout.Height(20))) {
-                    _rollbackManager.GoToFrame(_rollbackManager.GetCurrentFrameNum(), true);
+                    _rollbackManager.GoToFrame(_rollbackManager.GetDisplayedFrameNum(), true);
                     UnityEditor.EditorApplication.isPaused = false;
                 }
             } else {
@@ -80,7 +79,7 @@ namespace Packages.EZRollback.Editor {
             }
 
             if (GUILayout.Button(">", GUILayout.Width(30), GUILayout.Height(20))) {
-                _rollbackManager.GoToFrame(_rollbackManager.GetCurrentFrameNum() + 1, false);
+                _rollbackManager.GoToFrame(_rollbackManager.GetDisplayedFrameNum() + 1, false);
             }
             
             if (GUILayout.Button("=>", GUILayout.Width(30), GUILayout.Height(20))) {
@@ -95,16 +94,16 @@ namespace Packages.EZRollback.Editor {
                 EditorGUILayout.BeginHorizontal();
 
                 GUILayout.Label("CurrentFrame", GUILayout.Width(100));
-                int newFrameNum = (int)GUILayout.HorizontalSlider(_rollbackManager.GetCurrentFrameNum(), 1, (_rollbackManager.GetMaxFramesNum() - 1));
+                int newFrameNum = (int)GUILayout.HorizontalSlider(_rollbackManager.GetDisplayedFrameNum(), 1, (_rollbackManager.GetMaxFramesNum() - 1));
 
-                if (newFrameNum != _rollbackManager.GetCurrentFrameNum()) {
+                if (newFrameNum != _rollbackManager.GetDisplayedFrameNum()) {
                     _rollbackManager.GoToFrame(newFrameNum, false);
                     UnityEditor.EditorApplication.isPaused = true;
                 }
 
                 EditorGUILayout.EndHorizontal();
             
-                GUILayout.Label("Current frame number : " + (_rollbackManager.GetCurrentFrameNum() - 1) + " / " + (_rollbackManager.GetMaxFramesNum() - 1));
+                GUILayout.Label("Current frame number : " + (_rollbackManager.GetDisplayedFrameNum() - 1) + " / " + (_rollbackManager.GetMaxFramesNum() - 1));
             }
         }
 

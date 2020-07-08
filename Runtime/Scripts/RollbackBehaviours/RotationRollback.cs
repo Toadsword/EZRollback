@@ -1,10 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Packages.EZRollback.Runtime.Scripts;
-using UnityEngine;
+﻿using UnityEngine;
 
-
-namespace EZRollback.Core.Component {
+namespace Packages.EZRollback.Runtime.Scripts.RollbackBehaviours {
 public class RotationRollback : IRollbackBehaviour {
     [SerializeField] private RollbackElement<Quaternion> rotationRB = new RollbackElement<Quaternion>();
 

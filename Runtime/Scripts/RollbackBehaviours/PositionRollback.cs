@@ -1,11 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using Packages.EZRollback.Runtime.Scripts;
 using UnityEngine;
 
-namespace EZRollback.Core.Component {
+namespace Packages.EZRollback.Runtime.Scripts.RollbackBehaviours {
+
+[Serializable]
+public class RollbackElementVector3 : RollbackElement<Vector3> { }
+
+
 public class PositionRollback : IRollbackBehaviour {
-    [SerializeField] private RollbackElement<Vector3> positionRB = new RollbackElement<Vector3>();
+    [SerializeField] private RollbackElementVector3 positionRB = new RollbackElementVector3();
 
     public override void Simulate() {
     }
