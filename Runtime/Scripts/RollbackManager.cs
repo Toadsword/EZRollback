@@ -19,7 +19,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
         [SerializeField] int _maxFrameNum = 0;
         [SerializeField] int _displayedFrameNum = 0;
 
-        [SerializeField] int bufferSize = -1;
+        [SerializeField] int _bufferSize = -1;
 
         public int GetDisplayedFrameNum() {
             return _displayedFrameNum;
@@ -29,6 +29,13 @@ namespace Packages.EZRollback.Runtime.Scripts {
             return _maxFrameNum;
         }
 
+        public int GetBufferSize(int newValue) {
+            return _bufferSize;
+        }
+        
+        public void SetBufferSize(int newValue) {
+            _bufferSize = newValue;
+        }
 
         IRollbackBehaviour[] _rbRegisteredBehaviours;
         void OnEnable() {
@@ -131,10 +138,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
         }
 
         private void ManageBufferSize() {
-            if (bufferSize > 0 && _maxFrameNum > bufferSize) {
+            if (_bufferSize > 0 && _maxFrameNum > _bufferSize) {
                 deleteFramesDelegate.Invoke(1, true);
 
-                _maxFrameNum = bufferSize;
+                _maxFrameNum = _bufferSize;
                 _displayedFrameNum = _maxFrameNum;
             }
         }

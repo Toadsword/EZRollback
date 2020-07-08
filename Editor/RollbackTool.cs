@@ -10,9 +10,6 @@ namespace Packages.EZRollback.Editor {
 
         RollbackManager _rollbackManager;
         
-        bool openedObjectList = false;
-        int currentWantedSize = 0;
-
         int numFramesToSimulate = 0;
         
         [MenuItem("RollbackTool/Information")]

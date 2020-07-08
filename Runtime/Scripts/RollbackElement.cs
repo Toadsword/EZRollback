@@ -14,7 +14,6 @@ public class RollbackElement<T> {
     [SerializeField] int _head = 0;
     [SerializeField] int _tail = 0;
     [SerializeField] int _size = 0;
-
     public RollbackElement(T initValue = default, int baseSize = DEFAULT_SIZE) {
         InitializeRollbackElement(initValue, baseSize);
     }
@@ -32,6 +31,10 @@ public class RollbackElement<T> {
         _size = 0;
     }
 
+    public int GetCurrentFrameNumberValue() {
+        return _size - 1;
+    }
+    
     public T GetValue(int frameNum) {
         if (frameNum < _size) {
             return elements[(_tail + frameNum) % elements.Length];
