@@ -116,7 +116,7 @@ public abstract class InputQueue : MonoBehaviour
     public int GetNumOfControllers() {
         return _baseActions.Count;
     }
-    
+
     int CheckFrameNumber(int frameNumber) {
         for (int i = 0; i < _baseActions.Count; i++) {
             if (frameNumber < 0 || frameNumber > _baseActions[i].GetCurrentFrameNumberValue()) {
@@ -125,6 +125,13 @@ public abstract class InputQueue : MonoBehaviour
         }
 
         return frameNumber;
+    }
+
+    public void CorrectInputs(int controllerId, int numFrames, RollbackInputBaseActions[] rbInputBaseActions) {
+        int currentFrame = RollbackManager.inputQueue.GetCurrentFrameNumberValue();
+        for (int i = 0; i < currentFrame; i++) {
+            _baseActions[controllerId].CorrectValue(rbInputBaseActions[i], currentFrame - numFrames + i);
+        }
     }
 }
 }

@@ -48,6 +48,11 @@ public class RollbackElement<T> {
         SaveFrame();
     }
 
+    //Used for inputs and corrections of data
+    public void CorrectValue(T correctedValue, int frameNum) {
+        elements[(_tail + frameNum) % elements.Length] = correctedValue;
+    }
+
     public void SaveFrame() {
         elements[_head] = value;
 

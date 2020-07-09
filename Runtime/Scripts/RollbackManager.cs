@@ -40,24 +40,13 @@ namespace Packages.EZRollback.Runtime.Scripts {
         IRollbackBehaviour[] _rbRegisteredBehaviours;
         void OnEnable() {
             inputQueue = GetComponent<InputQueue>();
-            
-            _rbRegisteredBehaviours = GameObject.FindObjectsOfType<IRollbackBehaviour>();
 
-            foreach (IRollbackBehaviour rbBehaviour in _rbRegisteredBehaviours) {
-                RegisterRollbackBehaviour(rbBehaviour);
-            }
-            
             prepareInputDelegate += inputQueue.UpdateInputStatus;
             saveDelegate += inputQueue.SaveFrame;
             goToFrameDelegate += inputQueue.GoToFrame;
             deleteFramesDelegate += inputQueue.DeleteFrames;
         }
         void OnDisable() {
-            foreach (IRollbackBehaviour rbBehaviour in _rbRegisteredBehaviours) {
-                UnregisterRollbackBehaviour(rbBehaviour);
-            }
-            _rbRegisteredBehaviours = new IRollbackBehaviour[]{};
-            
             prepareInputDelegate -= inputQueue.UpdateInputStatus;
             saveDelegate -= inputQueue.SaveFrame;
             goToFrameDelegate -= inputQueue.GoToFrame;
@@ -72,6 +61,8 @@ namespace Packages.EZRollback.Runtime.Scripts {
             saveDelegate += rbBehaviour.SaveFrame;
             goToFrameDelegate += rbBehaviour.GoToFrame;
             deleteFramesDelegate += rbBehaviour.DeleteFrames;
+            
+            Debug.Log("Registered : " + rbBehaviour.name);
             rbBehaviour.registered = true;
         }
         
@@ -82,6 +73,8 @@ namespace Packages.EZRollback.Runtime.Scripts {
             saveDelegate -= rbBehaviour.SaveFrame;
             goToFrameDelegate -= rbBehaviour.GoToFrame;
             deleteFramesDelegate -= rbBehaviour.DeleteFrames;
+            
+            Debug.Log("UNREGISTERED : " + rbBehaviour.name);
             rbBehaviour.registered = false;
         }
 
@@ -94,7 +87,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
         // Update is called once per frame
         void FixedUpdate() {
             if (doRollback) {
-                GoToFrame(_displayedFrameNum - 1);
+                GoBackInFrames(1);
             } else {
                 Simulate(1);
                 if (bufferRestriction) {
@@ -110,12 +103,15 @@ namespace Packages.EZRollback.Runtime.Scripts {
                 _maxFrameNum = _displayedFrameNum;
             }
         }
+
+        public void GoBackInFrames(int numFrames, bool deleteFrames = true) {
+            GoToFrame(_displayedFrameNum - numFrames, deleteFrames);
+        }
         
         public void GoToFrame(int frameNumber, bool deleteFrames = true) {
             if (_maxFrameNum <= frameNumber || frameNumber < 0)
                 return;
-            Debug.Log("Success : GoToFrame(" + frameNumber + ");");
-            
+
             //Apply Goto
             goToFrameDelegate.Invoke(frameNumber);
 

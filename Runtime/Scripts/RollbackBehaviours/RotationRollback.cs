@@ -9,15 +9,7 @@ public class RollbackElementQuaternion : RollbackElement<Quaternion> { }
 
 public class RotationRollback : IRollbackBehaviour {
     [SerializeField] RollbackElementQuaternion rotationRB = new RollbackElementQuaternion();
-
-    void Start() {
-        RollbackManager.RegisterRollbackBehaviour(this);
-    }
-
-    void OnDestroy() {
-        RollbackManager.RegisterRollbackBehaviour(this);
-    }
-
+    
     public override void Simulate() {
     }
 

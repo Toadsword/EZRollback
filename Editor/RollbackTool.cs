@@ -159,9 +159,15 @@ namespace Packages.EZRollback.Editor {
                 EditorGUILayout.EndHorizontal();
             }
 
-            if (GUILayout.Button("Add Input to queue")) {
+            if (GUILayout.Button("Correct Inputs")) {
                 if (_rollbackManager != null) {
-                    RollbackManager.inputQueue.AddInput(_controllerId);
+                    RollbackInputBaseActions[] rbInputs = new RollbackInputBaseActions[_numFramesToSimulate];
+                    for (int i = 0; i < _numFramesToSimulate; i++) {
+                        rbInputs[i] = _rbBaseInput;
+                    }
+                    
+                    RollbackManager.inputQueue.CorrectInputs(_controllerId, _numFramesToSimulate, rbInputs);
+                    _rollbackManager.GoBackInFrames(_numFramesToSimulate);
                 }
             }
             
