@@ -9,10 +9,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
         
         public Action prepareInputDelegate;
         
-        public Action simulateDelegate;
-        public Action saveDelegate;
-        public Action<int> goToFrameDelegate;
-        public Action<int, bool> deleteFramesDelegate;
+        public static Action simulateDelegate;
+        public static Action saveDelegate;
+        public static Action<int> goToFrameDelegate;
+        public static Action<int, bool> deleteFramesDelegate;
 
         public static InputQueue inputQueue;
         
@@ -44,31 +44,38 @@ namespace Packages.EZRollback.Runtime.Scripts {
             _rbRegisteredBehaviours = GameObject.FindObjectsOfType<IRollbackBehaviour>();
 
             foreach (IRollbackBehaviour rbBehaviour in _rbRegisteredBehaviours) {
-                simulateDelegate += rbBehaviour.Simulate;
-                saveDelegate += rbBehaviour.SaveFrame;
-                goToFrameDelegate += rbBehaviour.GoToFrame;
-                deleteFramesDelegate += rbBehaviour.DeleteFrames;
+                RegisterRollbackBehaviour(rbBehaviour);
             }
             
-            prepareInputDelegate += inputQueue.PrepareInput;
+            prepareInputDelegate += inputQueue.UpdateInputStatus;
             saveDelegate += inputQueue.SaveFrame;
             goToFrameDelegate += inputQueue.GoToFrame;
             deleteFramesDelegate += inputQueue.DeleteFrames;
         }
-
         void OnDisable() {
             foreach (IRollbackBehaviour rbBehaviour in _rbRegisteredBehaviours) {
-                simulateDelegate -= rbBehaviour.Simulate;
-                saveDelegate -= rbBehaviour.SaveFrame;
-                goToFrameDelegate -= rbBehaviour.GoToFrame;
-                deleteFramesDelegate -= rbBehaviour.DeleteFrames;
+                UnregisterRollbackBehaviour(rbBehaviour);
             }
             _rbRegisteredBehaviours = new IRollbackBehaviour[]{};
             
-            prepareInputDelegate -= inputQueue.PrepareInput;
+            prepareInputDelegate -= inputQueue.UpdateInputStatus;
             saveDelegate -= inputQueue.SaveFrame;
             goToFrameDelegate -= inputQueue.GoToFrame;
             deleteFramesDelegate -= inputQueue.DeleteFrames;
+        }
+        
+        public static void RegisterRollbackBehaviour(IRollbackBehaviour rbBehaviour) {
+            simulateDelegate += rbBehaviour.Simulate;
+            saveDelegate += rbBehaviour.SaveFrame;
+            goToFrameDelegate += rbBehaviour.GoToFrame;
+            deleteFramesDelegate += rbBehaviour.DeleteFrames;
+        }
+        
+        public static void UnregisterRollbackBehaviour(IRollbackBehaviour rbBehaviour) {
+            simulateDelegate -= rbBehaviour.Simulate;
+            saveDelegate -= rbBehaviour.SaveFrame;
+            goToFrameDelegate -= rbBehaviour.GoToFrame;
+            deleteFramesDelegate -= rbBehaviour.DeleteFrames;
         }
 
         // Start is called before the first frame update

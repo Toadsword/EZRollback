@@ -6,7 +6,7 @@ public struct RollbackInputBaseActions {
     public sbyte horizontalValue;
     public sbyte verticalValue;
     public byte[] bits;
-
+ 
     public RollbackInputBaseActions(int defaultSize = 1) {
         bits = new byte[defaultSize];
         horizontalValue = 0;
