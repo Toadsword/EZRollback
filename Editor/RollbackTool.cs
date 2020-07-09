@@ -127,6 +127,12 @@ namespace Packages.EZRollback.Editor {
                     _rollbackManager.Simulate(_numFramesToSimulate);
                 }
             }
+            
+            if (GUILayout.Button("Go back x frames")) {
+                if (_rollbackManager != null) {
+                    _rollbackManager.GoBackInFrames(_numFramesToSimulate, false, false);
+                }
+            }
             EditorGUILayout.EndHorizontal();
         }
 
