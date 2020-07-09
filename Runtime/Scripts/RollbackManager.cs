@@ -17,7 +17,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
         public static InputQueue inputQueue;
         
         [SerializeField] int _maxFrameNum = 0;
-        [SerializeField] int _displayedFrameNum = 0;
+        [SerializeField] int _displayedFrameNum = -1;
 
         [SerializeField] int _bufferSize = -1;
 
@@ -65,23 +65,29 @@ namespace Packages.EZRollback.Runtime.Scripts {
         }
         
         public static void RegisterRollbackBehaviour(IRollbackBehaviour rbBehaviour) {
+            if (rbBehaviour.registered)
+                return;
+            
             simulateDelegate += rbBehaviour.Simulate;
             saveDelegate += rbBehaviour.SaveFrame;
             goToFrameDelegate += rbBehaviour.GoToFrame;
             deleteFramesDelegate += rbBehaviour.DeleteFrames;
+            rbBehaviour.registered = true;
         }
         
         public static void UnregisterRollbackBehaviour(IRollbackBehaviour rbBehaviour) {
+            if (!rbBehaviour.registered)
+                return;
             simulateDelegate -= rbBehaviour.Simulate;
             saveDelegate -= rbBehaviour.SaveFrame;
             goToFrameDelegate -= rbBehaviour.GoToFrame;
             deleteFramesDelegate -= rbBehaviour.DeleteFrames;
+            rbBehaviour.registered = false;
         }
 
         // Start is called before the first frame update
         void Start() {
-            
-            _displayedFrameNum = 0;
+            _displayedFrameNum = -1;
             _maxFrameNum = 0;
         }
 
@@ -106,9 +112,9 @@ namespace Packages.EZRollback.Runtime.Scripts {
         }
         
         public void GoToFrame(int frameNumber, bool deleteFrames = true) {
-            
-            if (_maxFrameNum < frameNumber || frameNumber < 0)
+            if (_maxFrameNum <= frameNumber || frameNumber < 0)
                 return;
+            Debug.Log("Success : GoToFrame(" + frameNumber + ");");
             
             //Apply Goto
             goToFrameDelegate.Invoke(frameNumber);
