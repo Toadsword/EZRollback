@@ -129,8 +129,8 @@ public abstract class InputQueue : MonoBehaviour
 
     public void CorrectInputs(int controllerId, int numFrames, RollbackInputBaseActions[] rbInputBaseActions) {
         int currentFrame = RollbackManager.inputQueue.GetCurrentFrameNumberValue();
-        for (int i = 0; i < currentFrame; i++) {
-            _baseActions[controllerId].CorrectValue(rbInputBaseActions[i], currentFrame - numFrames + i);
+        for (int i = 0; i < numFrames; i++) {
+            _baseActions[controllerId].CorrectValue(rbInputBaseActions[i],currentFrame - numFrames + i);
         }
     }
 }

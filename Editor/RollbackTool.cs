@@ -139,7 +139,7 @@ namespace Packages.EZRollback.Editor {
                 _rbBaseInput = new RollbackInputBaseActions(1 + _numOfInputs / 8);
             }
 
-            EditorGUILayout.IntSlider("ControllerId : ", _controllerId, 0, _rollbackManager.GetMaxFramesNum());
+            EditorGUILayout.IntField("ControllerId : ", _controllerId);
             
             //Vertical input
             float verticalValue = RollbackManager.inputQueue.TransformSByteToAxisValue(_rbBaseInput.verticalValue);
@@ -167,7 +167,7 @@ namespace Packages.EZRollback.Editor {
                     }
                     
                     RollbackManager.inputQueue.CorrectInputs(_controllerId, _numFramesToSimulate, rbInputs);
-                    _rollbackManager.GoBackInFrames(_numFramesToSimulate);
+                    _rollbackManager.ReSimulate(_numFramesToSimulate);
                 }
             }
             

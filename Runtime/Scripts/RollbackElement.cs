@@ -40,6 +40,10 @@ public class RollbackElement<T> {
             return elements[(_tail + frameNum) % elements.Length];
         }
 
+        if (frameNum == _size) {
+            return value;
+        }
+
         return default;
     }
 

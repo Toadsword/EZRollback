@@ -11,8 +11,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
         
         public static Action simulateDelegate;
         public static Action saveDelegate;
+        public static Action saveInputDelegate;
         public static Action<int> goToFrameDelegate;
         public static Action<int, bool> deleteFramesDelegate;
+        public static Action<int, bool> deleteFramesInputDelegate;
 
         public static InputQueue inputQueue;
         
@@ -42,15 +44,15 @@ namespace Packages.EZRollback.Runtime.Scripts {
             inputQueue = GetComponent<InputQueue>();
 
             prepareInputDelegate += inputQueue.UpdateInputStatus;
-            saveDelegate += inputQueue.SaveFrame;
+            saveInputDelegate += inputQueue.SaveFrame;
             goToFrameDelegate += inputQueue.GoToFrame;
-            deleteFramesDelegate += inputQueue.DeleteFrames;
+            deleteFramesInputDelegate += inputQueue.DeleteFrames;
         }
         void OnDisable() {
             prepareInputDelegate -= inputQueue.UpdateInputStatus;
-            saveDelegate -= inputQueue.SaveFrame;
+            saveInputDelegate -= inputQueue.SaveFrame;
             goToFrameDelegate -= inputQueue.GoToFrame;
-            deleteFramesDelegate -= inputQueue.DeleteFrames;
+            deleteFramesInputDelegate -= inputQueue.DeleteFrames;
         }
         
         public static void RegisterRollbackBehaviour(IRollbackBehaviour rbBehaviour) {
@@ -62,19 +64,18 @@ namespace Packages.EZRollback.Runtime.Scripts {
             goToFrameDelegate += rbBehaviour.GoToFrame;
             deleteFramesDelegate += rbBehaviour.DeleteFrames;
             
-            Debug.Log("Registered : " + rbBehaviour.name);
             rbBehaviour.registered = true;
         }
         
         public static void UnregisterRollbackBehaviour(IRollbackBehaviour rbBehaviour) {
             if (!rbBehaviour.registered)
                 return;
+            
             simulateDelegate -= rbBehaviour.Simulate;
             saveDelegate -= rbBehaviour.SaveFrame;
             goToFrameDelegate -= rbBehaviour.GoToFrame;
             deleteFramesDelegate -= rbBehaviour.DeleteFrames;
             
-            Debug.Log("UNREGISTERED : " + rbBehaviour.name);
             rbBehaviour.registered = false;
         }
 
@@ -96,19 +97,22 @@ namespace Packages.EZRollback.Runtime.Scripts {
             }
         }
 
-        private void SetCurrentFrameAsLastRegistered() {
+        private void SetCurrentFrameAsLastRegistered(bool deleteInputs = true) {
             if (_displayedFrameNum != _maxFrameNum) {
                 //Apply set
                 deleteFramesDelegate.Invoke(_maxFrameNum - _displayedFrameNum, false);
+                if (deleteInputs) {
+                    deleteFramesInputDelegate.Invoke(_maxFrameNum - _displayedFrameNum, false);
+                }
                 _maxFrameNum = _displayedFrameNum;
             }
         }
 
-        public void GoBackInFrames(int numFrames, bool deleteFrames = true) {
-            GoToFrame(_displayedFrameNum - numFrames, deleteFrames);
+        public void GoBackInFrames(int numFrames, bool deleteFrames = true, bool inputsToo = true) {
+            GoToFrame(_displayedFrameNum - numFrames, deleteFrames, inputsToo);
         }
         
-        public void GoToFrame(int frameNumber, bool deleteFrames = true) {
+        public void GoToFrame(int frameNumber, bool deleteFrames = true, bool inputsToo = true) {
             if (_maxFrameNum <= frameNumber || frameNumber < 0)
                 return;
 
@@ -117,33 +121,43 @@ namespace Packages.EZRollback.Runtime.Scripts {
 
             _displayedFrameNum = frameNumber;
             if (deleteFrames) {
-                SetCurrentFrameAsLastRegistered();
+                SetCurrentFrameAsLastRegistered(inputsToo);
                 _maxFrameNum = _displayedFrameNum;
             }
         }
 
 
-        public void SaveCurrentFrame() {
+        public void SaveCurrentFrame(bool inputsToo = true) {
             //If we try to save a frame while in restored state, we delete the first predicted future
-            SetCurrentFrameAsLastRegistered();
+            SetCurrentFrameAsLastRegistered(inputsToo);
 
             //Apply save
             saveDelegate.Invoke();
+            if (inputsToo) {
+                saveInputDelegate.Invoke();
+            }
             
             _displayedFrameNum++;
             _maxFrameNum = _displayedFrameNum;
         }
 
         // From the currently loaded frame, simutate x frames by calling fixed update on all the rollbackElements
-        public void Simulate(int numFrames) {
-            SetCurrentFrameAsLastRegistered();
+        public void Simulate(int numFrames, bool inputsToo = true) {
+            SetCurrentFrameAsLastRegistered(inputsToo);
 
             for (int i = 0; i < numFrames; i++) {
                 //Apply simulate and save for each frames
-                prepareInputDelegate.Invoke();
+                if (inputsToo){
+                    prepareInputDelegate.Invoke();
+                }
                 simulateDelegate.Invoke();
-                SaveCurrentFrame();
+                SaveCurrentFrame(inputsToo);
             }
+        }
+
+        public void ReSimulate(int numFrames) {
+            GoBackInFrames(numFrames, true, false);
+            Simulate(numFrames, false);
         }
 
         private void ManageBufferSize() {

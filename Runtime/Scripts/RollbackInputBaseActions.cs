@@ -8,7 +8,7 @@ public struct RollbackInputBaseActions {
     public byte[] bits;
  
     public RollbackInputBaseActions(int defaultSize = 1) {
-        bits = new byte[defaultSize];
+        bits = new byte[1 + defaultSize/8];
         horizontalValue = 0;
         verticalValue = 0;
     }
