@@ -87,6 +87,9 @@ namespace Packages.EZRollback.Runtime.Scripts {
 
         // Update is called once per frame
         void FixedUpdate() {
+            if(deleteFramesDelegate == null)
+                return;
+            
             if (doRollback) {
                 GoBackInFrames(1);
             } else {
@@ -156,8 +159,12 @@ namespace Packages.EZRollback.Runtime.Scripts {
         }
 
         public void ReSimulate(int numFrames) {
+            Debug.Log("GetMaxFramesNum : " + GetMaxFramesNum());
+            Debug.Log("GetDisplayedFrameNum : " + GetDisplayedFrameNum());
             GoBackInFrames(numFrames, true, false);
+            Debug.Log("GetDisplayedFrameNum between : " + GetDisplayedFrameNum());
             Simulate(numFrames, false);
+            Debug.Log("GetDisplayedFrameNum 3 : " + GetDisplayedFrameNum());
         }
 
         private void ManageBufferSize() {
