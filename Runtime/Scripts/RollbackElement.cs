@@ -30,10 +30,6 @@ public class RollbackElement<T> {
         _tail = 0;
         _size = 0;
     }
-
-    public int GetCurrentFrameNumberValue() {
-        return _size;
-    }
     
     public T GetValue(int frameNum) {
         if (frameNum < _size) {
@@ -85,7 +81,7 @@ public class RollbackElement<T> {
                 _head += elements.Length;
             }
         }
-
+        
         _size -= numFramesToDelete;
 
         //That means we deleted all the frames

@@ -220,7 +220,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &379629672
 Transform:
   m_ObjectHideFlags: 0
@@ -350,6 +350,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75de625bf39a9414db15cdaab3b6a2db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _horizontal: 0
+  _vertical: 0
 --- !u!212 &1299396096
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -516,6 +518,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   registered: 0
+  _horizontal: 0
+  _vertical: 0
 --- !u!212 &1494728978
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -656,6 +660,11 @@ PrefabInstance:
         type: 3}
       propertyPath: _bufferSize
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 5046051155018766375, guid: 096f619208d54234ca409cb26970225f,
+        type: 3}
+      propertyPath: _displayedFrameNum
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 096f619208d54234ca409cb26970225f, type: 3}

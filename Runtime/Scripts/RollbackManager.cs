@@ -4,6 +4,17 @@ using UnityEngine;
 namespace Packages.EZRollback.Runtime.Scripts {
 
     public class RollbackManager : MonoBehaviour {
+
+        public static RollbackManager _instance;
+
+        void Awake() {
+            if (_instance == null) {
+                _instance = this;
+            } else {
+                Destroy(this);
+            }
+        }
+
         public bool doRollback = false;
         public bool bufferRestriction = false;
         
@@ -16,10 +27,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
         public static Action<int, bool> deleteFramesDelegate;
         public static Action<int, bool> deleteFramesInputDelegate;
 
-        public static InputQueue inputQueue;
+        public InputQueue inputQueue;
         
         [SerializeField] int _maxFrameNum = 0;
-        [SerializeField] int _displayedFrameNum = -1;
+        [SerializeField] int _displayedFrameNum = 0;
 
         [SerializeField] int _bufferSize = -1;
 
@@ -81,7 +92,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
 
         // Start is called before the first frame update
         void Start() {
-            _displayedFrameNum = -1;
+            _displayedFrameNum = 0;
             _maxFrameNum = 0;
         }
 
@@ -159,17 +170,14 @@ namespace Packages.EZRollback.Runtime.Scripts {
         }
 
         public void ReSimulate(int numFrames) {
-            Debug.Log("GetMaxFramesNum : " + GetMaxFramesNum());
-            Debug.Log("GetDisplayedFrameNum : " + GetDisplayedFrameNum());
             GoBackInFrames(numFrames, true, false);
-            Debug.Log("GetDisplayedFrameNum between : " + GetDisplayedFrameNum());
             Simulate(numFrames, false);
-            Debug.Log("GetDisplayedFrameNum 3 : " + GetDisplayedFrameNum());
         }
 
         private void ManageBufferSize() {
             if (_bufferSize > 0 && _maxFrameNum > _bufferSize) {
                 deleteFramesDelegate.Invoke(1, true);
+                deleteFramesInputDelegate.Invoke(1, true);
 
                 _maxFrameNum = _bufferSize;
                 _displayedFrameNum = _maxFrameNum;

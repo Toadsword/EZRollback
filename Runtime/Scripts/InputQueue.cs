@@ -18,12 +18,7 @@ public abstract class InputQueue : MonoBehaviour
     
     [SerializeField] protected List<RollbackElementRollbackInputBaseActions> _baseActions = new List<RollbackElementRollbackInputBaseActions>();
 
-    public int GetCurrentFrameNumberValue() {
-        return _baseActions[0].GetCurrentFrameNumberValue();
-    }
-
     void OnEnable() {
-        Debug.Log("OnEnable InputQueue");
         if (_baseActions == null) {
             _baseActions = new List<RollbackElementRollbackInputBaseActions>();
         }
@@ -92,7 +87,7 @@ public abstract class InputQueue : MonoBehaviour
 
     public virtual bool GetInputDown(int actionValue, int controllerId, int frameNumber = -1) {
         frameNumber = CheckFrameNumber(frameNumber);
-        return !_baseActions[controllerId].GetValue(_baseActions[controllerId].GetCurrentFrameNumberValue()).GetValueBit(actionValue) && 
+        return !_baseActions[controllerId].GetValue(frameNumber).GetValueBit(actionValue) && 
                _baseActions[controllerId].value.GetValueBit(actionValue);
     }
     
@@ -117,21 +112,19 @@ public abstract class InputQueue : MonoBehaviour
         return _baseActions.Count;
     }
 
-    int CheckFrameNumber(int frameNumber) {
-        for (int i = 0; i < _baseActions.Count; i++) {
-            if (frameNumber < 0 || frameNumber > _baseActions[i].GetCurrentFrameNumberValue()) {
-                frameNumber = _baseActions[i].GetCurrentFrameNumberValue();
-            }
-        }
-
-        return frameNumber;
-    }
-
     public void CorrectInputs(int controllerId, int numFrames, RollbackInputBaseActions[] rbInputBaseActions) {
-        int currentFrame = RollbackManager.inputQueue.GetCurrentFrameNumberValue();
+        int currentFrame = RollbackManager._instance.GetDisplayedFrameNum();
         for (int i = 0; i < numFrames; i++) {
             _baseActions[controllerId].CorrectValue(rbInputBaseActions[i],currentFrame - numFrames + i);
         }
+    }
+    
+    private int CheckFrameNumber(int frameNumber) {
+        if (frameNumber < 0 || frameNumber > RollbackManager._instance.GetDisplayedFrameNum()) {
+            frameNumber = RollbackManager._instance.GetDisplayedFrameNum();
+        }
+
+        return frameNumber;
     }
 }
 }

@@ -45,8 +45,7 @@ namespace Packages.EZRollback.Editor {
         private void LogPlayModeState(PlayModeStateChange playModeStateChange) {
             switch (playModeStateChange) {
                 case PlayModeStateChange.EnteredPlayMode:
-                    _rollbackManager = GameObject.FindObjectOfType<RollbackManager>(); 
-                    Debug.Log(_rollbackManager.name);
+                    _rollbackManager = GameObject.FindObjectOfType<RollbackManager>();
                     if (_rollbackManager == null) {
                         _rollbackManager = Instantiate(Resources.Load("RollbackManagerPrefab") as GameObject, Vector3.zero, Quaternion.identity).GetComponent<RollbackManager>();
                     }
@@ -96,7 +95,7 @@ namespace Packages.EZRollback.Editor {
             }
             
             if (GUILayout.Button("=>", GUILayout.Width(30), GUILayout.Height(20))) {
-                _rollbackManager.GoToFrame(_rollbackManager.GetMaxFramesNum() - 1, false);
+                _rollbackManager.GoToFrame(_rollbackManager.GetMaxFramesNum(), false);
             }
             
             EditorGUILayout.EndHorizontal();
@@ -107,7 +106,7 @@ namespace Packages.EZRollback.Editor {
 
             GUILayout.Label("CurrentFrame", GUILayout.Width(100));
             int newFrameNum = (int) GUILayout.HorizontalSlider(_rollbackManager.GetDisplayedFrameNum(), 0,
-                (_rollbackManager.GetMaxFramesNum() - 1));
+                (_rollbackManager.GetMaxFramesNum()));
 
             if (newFrameNum != _rollbackManager.GetDisplayedFrameNum()) {
                 _rollbackManager.GoToFrame(newFrameNum, false);
@@ -116,7 +115,7 @@ namespace Packages.EZRollback.Editor {
 
             EditorGUILayout.EndHorizontal();
 
-            GUILayout.Label("Current frame number : " + (_rollbackManager.GetDisplayedFrameNum()) + " / " + (_rollbackManager.GetMaxFramesNum() - 1));
+            GUILayout.Label("Current frame number : " + (_rollbackManager.GetDisplayedFrameNum()) + " / " + (_rollbackManager.GetMaxFramesNum()));
         }
 
         private void DisplaySimulateOptions() {
@@ -151,19 +150,19 @@ namespace Packages.EZRollback.Editor {
             EditorGUILayout.IntField("ControllerId : ", _controllerId);
             
             //Vertical input
-            float verticalValue = RollbackManager.inputQueue.TransformSByteToAxisValue(_rbBaseInput.verticalValue);
+            float verticalValue = _rollbackManager.inputQueue.TransformSByteToAxisValue(_rbBaseInput.verticalValue);
             verticalValue = EditorGUILayout.Slider("Vertical", verticalValue, -1f, 1f);
-            _rbBaseInput.verticalValue = RollbackManager.inputQueue.TransformAxisValueToSByte(verticalValue);
+            _rbBaseInput.verticalValue = _rollbackManager.inputQueue.TransformAxisValueToSByte(verticalValue);
             
             //Vertical input
-            float horizontalValue = RollbackManager.inputQueue.TransformSByteToAxisValue(_rbBaseInput.horizontalValue);
+            float horizontalValue = _rollbackManager.inputQueue.TransformSByteToAxisValue(_rbBaseInput.horizontalValue);
             horizontalValue = EditorGUILayout.Slider("Horizontal", horizontalValue, -1f, 1f);
-            _rbBaseInput.horizontalValue = RollbackManager.inputQueue.TransformAxisValueToSByte(horizontalValue);
+            _rbBaseInput.horizontalValue = _rollbackManager.inputQueue.TransformAxisValueToSByte(horizontalValue);
 
             for (int i = 0; i < _numOfInputs; i++) {
                 EditorGUILayout.BeginHorizontal();
                 bool initValue = _rbBaseInput.GetValueBit(i);
-                initValue = EditorGUILayout.Toggle(RollbackManager.inputQueue.GetActionName(i), initValue);
+                initValue = EditorGUILayout.Toggle(_rollbackManager.inputQueue.GetActionName(i), initValue);
                 _rbBaseInput.SetOrClearBit(i, initValue);
                 EditorGUILayout.EndHorizontal();
             }
@@ -176,11 +175,10 @@ namespace Packages.EZRollback.Editor {
                         rbInputs[i] = _rbBaseInput;
                     }
                     
-                    RollbackManager.inputQueue.CorrectInputs(_controllerId, _numFramesToSimulate, rbInputs);
+                    _rollbackManager.inputQueue.CorrectInputs(_controllerId, _numFramesToSimulate, rbInputs);
                     _rollbackManager.ReSimulate(_numFramesToSimulate);
                 }
             }
-            
         }
     }
 }

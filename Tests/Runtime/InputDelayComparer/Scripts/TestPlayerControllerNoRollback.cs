@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class TestPlayerControllerNoRollback : MonoBehaviour
 {
-    private float _horizontal = 0.0f;
-    private float _vertical = 0.0f;
+    [SerializeField] private float _horizontal = 0.0f;
+    [SerializeField] private float _vertical = 0.0f;
 
     // Update is called once per frame
     void Update() {
