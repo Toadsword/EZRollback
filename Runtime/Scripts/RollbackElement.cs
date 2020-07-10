@@ -63,9 +63,13 @@ public class RollbackElement<T> {
     }
 
     public void SetValueFromFrameNumber(int frameNum) {
-        if (-1 > frameNum && frameNum > _size) {
+        if (-1 > frameNum) {
             Debug.LogError("Cannot go back from higher number of registered frames");
             return;
+        }
+
+        if (frameNum >= _size) {
+            frameNum = _size - 1;
         }
         
         value = elements[(_tail + frameNum) % elements.Length];

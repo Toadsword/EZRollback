@@ -95,7 +95,7 @@ namespace Packages.EZRollback.Editor {
             }
             
             if (GUILayout.Button("=>", GUILayout.Width(30), GUILayout.Height(20))) {
-                _rollbackManager.GoToFrame(_rollbackManager.GetMaxFramesNum(), false);
+                _rollbackManager.GoToFrame(_rollbackManager.GetMaxFramesNum() - 1, false);
             }
             
             EditorGUILayout.EndHorizontal();
