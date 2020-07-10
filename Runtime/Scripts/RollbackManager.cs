@@ -127,7 +127,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
         }
         
         public void GoToFrame(int frameNumber, bool deleteFrames = true, bool inputsToo = true) {
-            if (_maxFrameNum <= frameNumber || frameNumber < 0)
+            if (_maxFrameNum < frameNumber || frameNumber < 0)
                 return;
 
             //Apply Goto
