@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using InControl;
 using UnityEngine;
 
 public class TestPlayerControllerNoRollback : MonoBehaviour
@@ -10,10 +9,9 @@ public class TestPlayerControllerNoRollback : MonoBehaviour
     private float _vertical = 0.0f;
 
     // Update is called once per frame
-    void Update()
-    {
-        _horizontal = InputActionManager.GetAxis(InputActionManager.AxisType.HORIZONTAL);
-        _vertical = InputActionManager.GetAxis(InputActionManager.AxisType.VERTICAL);
+    void Update() {
+        _horizontal = Input.GetAxisRaw("Horizontal");
+        _vertical = Input.GetAxisRaw("Vertical");
     }
 
     void FixedUpdate() {

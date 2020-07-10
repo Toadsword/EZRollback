@@ -1,12 +1,14 @@
 {
-    "name": "Unity.Ezrollback.Tests",
-    "references": [],
+    "name": "Unity.Ezrollback.Tests.Runtime",
+    "references": [
+        "GUID:17373b81308ade44ca92bd0f050c6233"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
+    "overrideReferences": true,
     "precompiledReferences": [],
-    "autoReferenced": true,
+    "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false

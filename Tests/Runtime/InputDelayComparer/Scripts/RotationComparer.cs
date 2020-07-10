@@ -18,7 +18,7 @@ public class RotationComparer : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (recording) {
             if (_transform1.rotation.Equals(_transform2.rotation)) {
