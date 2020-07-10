@@ -50,6 +50,8 @@ namespace Packages.EZRollback.Editor {
                     if (_rollbackManager == null) {
                         _rollbackManager = Instantiate(Resources.Load("RollbackManagerPrefab") as GameObject, Vector3.zero, Quaternion.identity).GetComponent<RollbackManager>();
                     }
+                    
+                    _rbBaseInput = new RollbackInputBaseActions(1 + _numOfInputs / 8);
                     break;
             }
         }
