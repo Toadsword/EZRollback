@@ -2,25 +2,26 @@
 using UnityEngine;
 
 namespace Packages.EZRollback.Runtime.Scripts {
+
+/*
+ * \brief Element to rollback that takes any type of data and handles the storage of the history of its value through frames.
+ * THe data are stored in the form of a closed list.
+ */
 [Serializable]
 public class RollbackElement<T> {
-    const int DEFAULT_SIZE = 51;
+    const int DEFAULT_SIZE = 51; // Default array size
     
-    //[SerializeField] List<T> elements = new List<T>();
-    [SerializeField] T[] elements;
+    [SerializeField] T[] _history; // History through frames of the value
 
-    [SerializeField] public T value;
+    [SerializeField] public T value; // Current value of the frame
     
     [SerializeField] int _head = 0;
     [SerializeField] int _tail = 0;
     [SerializeField] int _size = 0;
+    
     public RollbackElement(T initValue = default, int baseSize = DEFAULT_SIZE) {
-        InitializeRollbackElement(initValue, baseSize);
-    }
-
-    private void InitializeRollbackElement(T initValue, int baseSize) {
         value = initValue;
-        elements = new T[baseSize];
+        _history = new T[baseSize];
 
         Clear();
     }
@@ -31,37 +32,56 @@ public class RollbackElement<T> {
         _size = 0;
     }
     
+    /**
+     * \brief Get the value stored at the requested frame number.
+     * If the frame number is higher than the size or below 0, returns the current value instead
+     * \param frameNum Number of the frame requested
+     */
     public T GetValue(int frameNum) {
         if (frameNum == _size || frameNum < 0) {
             return value;
         }
 
         if (frameNum < _size) {
-            return elements[(_tail + frameNum) % elements.Length];
+            return _history[(_tail + frameNum) % _history.Length];
         }
 
         return default;
     }
 
+    /**
+     * \brief Set and save in the history the value passed in parameters
+     * \param newValue 
+     */
     public void SetAndSaveValue(T newValue) {
         value = newValue;
         SaveFrame();
     }
 
-    //Used for inputs and corrections of data
+    /**
+     * \brief Set a new value to a specific frame number. Used to correct the value due to a probable mistake in the values (notably in inputs with networking)
+     * \param correctedValue New value
+     * \param frameNum Frame number to correct 
+     */
     public void CorrectValue(T correctedValue, int frameNum) {
-        elements[(_tail + frameNum) % elements.Length] = correctedValue;
+        _history[(_tail + frameNum) % _history.Length] = correctedValue;
     }
 
+    /**
+     * \brief Save the current value in the history
+     */
     public void SaveFrame() {
-        elements[_head] = value;
+        _history[_head] = value;
 
         _head++;
         _size++;
         
-        CheckArraySize();
+        CheckHistorySize();
     }
 
+    /**
+     * \brief Restore the current value to an anterior frame.
+     */
     public void SetValueFromFrameNumber(int frameNum) {
         if (-1 > frameNum) {
             Debug.LogError("Cannot go back from higher number of registered frames");
@@ -72,17 +92,22 @@ public class RollbackElement<T> {
             frameNum = _size - 1;
         }
         
-        value = elements[(_tail + frameNum) % elements.Length];
+        value = _history[(_tail + frameNum) % _history.Length];
     }
     
+    /**
+     * \brief Delete frames in the history.
+     * \param numFramesToDelete number of frames to delete
+     * \param firstFrames Delete the x first frames if true, delete the last frames otherwise
+     */
     public void DeleteFrames(int numFramesToDelete, bool firstFrames) {
         if (firstFrames) {
             _tail += numFramesToDelete;
-            _tail = _tail % elements.Length;
+            _tail = _tail % _history.Length;
         } else {
             _head -= numFramesToDelete;
             if (_head < 0) {
-                _head += elements.Length;
+                _head += _history.Length;
             }
         }
         
@@ -96,23 +121,31 @@ public class RollbackElement<T> {
         }
     }
 
-    private void CheckArraySize() {
-        _head = _head % elements.Length;
+    
+    /**
+     * \brief Check the size of the history. If the needs are higher than the capacity, we resize the history
+     */
+    private void CheckHistorySize() {
+        _head = _head % _history.Length;
 
-        if (_head == _tail && _size == elements.Length) {
-            Resize(elements.Length * 2);
+        if (_head == _tail && _size == _history.Length) {
+            Resize(_history.Length * 2);
         }
     }
 
+    /**
+     * \brief Resize the closed list History to a new size.
+     * \param newSize New size wanted of the array
+     */
     private void Resize(int newSize) {
-        int currentSize = elements.Length;
+        int currentSize = _history.Length;
         
-        T[] oldElements = elements;
-        elements = new T[newSize];
+        T[] old_history = _history;
+        _history = new T[newSize];
 
         //For each element of the previous buffer
         for (int i = 0; i < _size; i++) {
-            elements[i] = oldElements[( _tail + i) % currentSize];
+            _history[i] = old_history[( _tail + i) % currentSize];
         }
 
         _tail = 0;

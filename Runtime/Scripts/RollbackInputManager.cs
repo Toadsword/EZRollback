@@ -89,13 +89,26 @@ public abstract class RollbackInputManager : MonoBehaviour
             _playerInputList[i].SetValueFromFrameNumber(frameNumber);
         }
     }
-
+    
+    /**
+     * \brief Delete a certain number of frames for all the players
+     * \param numFramesToDelete Number of frames to delete
+     * \param bool True to delete the x first frames, False to delete the x last frames registered
+     */
     public void DeleteFrames(int numFramesToDelete, bool firstFrames) {
         for (int i = 0; i < _playerInputList.Count; i++) {
             _playerInputList[i].DeleteFrames(numFramesToDelete, firstFrames);
         }
     }
-
+    
+    /**
+     * \brief Get the value of the requested axis, of a playerId to a certain frame.
+     * This function can be overwritten to include more axis
+     * \param axis Axis to retrieve
+     * \param playerId Id of the player
+     * \param frameNumber Frame number to get. Returns the current value by default
+     * \return Value of the axis
+     */
     public virtual float GetAxis(AxisEnum axis, int playerId, int frameNumber = -1) {
         if (playerId >= _playerInputList.Count)
             return 0.0f;
@@ -111,31 +124,70 @@ public abstract class RollbackInputManager : MonoBehaviour
         return 0.0f;
     }
     
+    /**
+     * \brief Get the value of the button, of a playerId to a certain frame.
+     * This function can be overwritten to special needs
+     * \param actionValue Action to retrieve
+     * \param playerId Id of the player
+     * \param frameNumber Frame number to get. Returns the current value by default
+     * \return Value of the action, true if pressed, false otherwise
+     */
     public virtual bool GetInput(int actionValue, int playerId, int frameNumber = -1) {
         frameNumber = CheckFrameNumber(frameNumber);
         return _playerInputList[playerId].GetValue(frameNumber).GetValueBit(actionValue);
     }
 
+    /**
+     * \brief Get the value of the button if down at that specific frame, of a playerId to a certain frame.
+     * This function can be overwritten to special needs
+     * \param actionValue Action to retrieve
+     * \param playerId Id of the player
+     * \param frameNumber Frame number to get. Returns the current value by default
+     * \return Value of the action, true if pressed at requested frame, false otherwise
+     */
     public virtual bool GetInputDown(int actionValue, int playerId, int frameNumber = -1) {
         frameNumber = CheckFrameNumber(frameNumber);
         return !_playerInputList[playerId].GetValue(frameNumber - 1).GetValueBit(actionValue) && 
                _playerInputList[playerId].value.GetValueBit(actionValue);
     }
     
+    /**
+     * \brief Get the value of the button if up at that specific frame, of a playerId to a certain frame.
+     * This function can be overwritten to special needs
+     * \param actionValue Action to retrieve
+     * \param playerId Id of the player
+     * \param frameNumber Frame number to get. Returns the current value by default
+     * \return Value of the action, true if released at requested frame, false otherwise
+     */
     public virtual bool GetInputUp(int actionValue, int playerId, int frameNumber = -1) {
         frameNumber = CheckFrameNumber(frameNumber);
         return _playerInputList[playerId].GetValue(frameNumber - 1).GetValueBit(actionValue) && 
                !_playerInputList[playerId].GetValue(frameNumber).GetValueBit(actionValue);
     }
     
+    /**
+     * \brief Get the name of the action at requested index. 
+     * \param actionIndex 
+     * \return String value of the action
+     */
     public virtual string GetActionName(int actionIndex) {
         return actionIndex.ToString();
     }
 
-    public int GetNumOfControllers() {
+    /**
+     * \brief Returns the number of registered players
+     * \return 
+     */
+    public int GetNumOfPlayers() {
         return _playerInputList.Count;
     }
 
+    /**
+     * \brief Correct the inputs of a given player for a number of frames from the actual frames.
+     * \param playerId ID of the player
+     * \param numFrames Number of frames to correct from the currentFrame
+     * \param rbInputBaseActions Array of actions that will replace the current ones
+     */
     public void CorrectInputs(int playerId, int numFrames, RollbackInputBaseActions[] rbInputBaseActions) {
         int currentFrame = RollbackManager._instance.GetDisplayedFrameNum();
         for (int i = 0; i < numFrames; i++) {
@@ -143,6 +195,11 @@ public abstract class RollbackInputManager : MonoBehaviour
         }
     }
     
+    /**
+     * \brief Check the frame number, and depending on the input, correct it and returns a value that will not make the program crash because of a random out of range
+     * \param frameNumber Requested frame number
+     * \return Corrected value
+     */
     private int CheckFrameNumber(int frameNumber) {
         if (frameNumber < 0 || frameNumber > RollbackManager._instance.GetDisplayedFrameNum()) {
             frameNumber = RollbackManager._instance.GetDisplayedFrameNum();
