@@ -13,7 +13,7 @@ public class RotationRollback : IRollbackBehaviour {
     public override void Simulate() {
     }
 
-    public override void GoToFrame(int frameNumber) {
+    public override void SetValueFromFrameNumber(int frameNumber) {
         rotationRB.SetValueFromFrameNumber(frameNumber);
         transform.rotation = rotationRB.value;
     }

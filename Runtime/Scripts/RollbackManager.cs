@@ -72,7 +72,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
             
             simulateDelegate += rbBehaviour.Simulate;
             saveDelegate += rbBehaviour.SaveFrame;
-            goToFrameDelegate += rbBehaviour.GoToFrame;
+            goToFrameDelegate += rbBehaviour.SetValueFromFrameNumber;
             deleteFramesDelegate += rbBehaviour.DeleteFrames;
             
             rbBehaviour.registered = true;
@@ -84,7 +84,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
             
             simulateDelegate -= rbBehaviour.Simulate;
             saveDelegate -= rbBehaviour.SaveFrame;
-            goToFrameDelegate -= rbBehaviour.GoToFrame;
+            goToFrameDelegate -= rbBehaviour.SetValueFromFrameNumber;
             deleteFramesDelegate -= rbBehaviour.DeleteFrames;
             
             rbBehaviour.registered = false;
@@ -123,10 +123,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
         }
 
         public void GoBackInFrames(int numFrames, bool deleteFrames = true, bool inputsToo = true) {
-            GoToFrame(_displayedFrameNum - numFrames, deleteFrames, inputsToo);
+            SetValueFromFrameNumber(_displayedFrameNum - numFrames, deleteFrames, inputsToo);
         }
         
-        public void GoToFrame(int frameNumber, bool deleteFrames = true, bool inputsToo = true) {
+        public void SetValueFromFrameNumber(int frameNumber, bool deleteFrames = true, bool inputsToo = true) {
             if (_maxFrameNum < frameNumber || frameNumber < 0)
                 return;
 

@@ -18,7 +18,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
         //Work instead of FixedUpdate
         public abstract void Simulate();
 
-        public abstract void GoToFrame(int frameNumber);
+        public abstract void SetValueFromFrameNumber(int frameNumber);
 
         public abstract void DeleteFrames(int numFramesToDelete, bool firstFrames);
 

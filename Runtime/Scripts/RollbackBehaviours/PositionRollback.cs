@@ -14,7 +14,7 @@ public class PositionRollback : IRollbackBehaviour {
     public override void Simulate() {
     }
 
-    public override void GoToFrame(int frameNumber) {
+    public override void SetValueFromFrameNumber(int frameNumber) {
         positionRB.SetValueFromFrameNumber(frameNumber);
         transform.position = positionRB.value;
     }

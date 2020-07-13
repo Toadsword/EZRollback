@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Packages.EZRollback.Editor.Utils;
 using Packages.EZRollback.Runtime.Scripts;
 using UnityEditor;
 using UnityEngine;
@@ -31,13 +32,13 @@ namespace Packages.EZRollback.Editor {
             DisplayRollbackEditionButtons();
 
             if (UnityEditor.EditorApplication.isPlaying && _rollbackManager != null) {
-                EditorGUILayout.Separator();
-                DisplayInformations();
-                
-                EditorGUILayout.Separator();
+                GUIUtils.GuiLine(3);
+                DisplayRollbackInformations();
+
+                GUIUtils.GuiLine(3);
                 DisplaySimulateOptions();
-                
-                EditorGUILayout.Separator();
+            
+                GUIUtils.GuiLine(3);
                 DisplaySimulateInput();
             }
         }
@@ -56,16 +57,17 @@ namespace Packages.EZRollback.Editor {
         }
 
         private void DisplayRollbackEditionButtons() {
+            
+            
             EditorGUILayout.BeginHorizontal();
-            
-            
+
             if (GUILayout.Button("<=", GUILayout.Width(30), GUILayout.Height(20))) {
-                _rollbackManager.GoToFrame(0, false);
+                _rollbackManager.SetValueFromFrameNumber(0, false);
                 UnityEditor.EditorApplication.isPaused = true;
             }
             
             if (GUILayout.Button("<", GUILayout.Width(30), GUILayout.Height(20))) {
-                _rollbackManager.GoToFrame(_rollbackManager.GetDisplayedFrameNum() - 1, false);
+                _rollbackManager.SetValueFromFrameNumber(_rollbackManager.GetDisplayedFrameNum() - 1, false);
                 UnityEditor.EditorApplication.isPaused = true;
             }
 
@@ -81,7 +83,7 @@ namespace Packages.EZRollback.Editor {
 
             if (UnityEditor.EditorApplication.isPaused) {
                 if (GUILayout.Button("Resume", GUILayout.Width(100), GUILayout.Height(20))) {
-                    _rollbackManager.GoToFrame(_rollbackManager.GetDisplayedFrameNum(), true);
+                    _rollbackManager.SetValueFromFrameNumber(_rollbackManager.GetDisplayedFrameNum(), true);
                     UnityEditor.EditorApplication.isPaused = false;
                 }
             } else {
@@ -91,25 +93,27 @@ namespace Packages.EZRollback.Editor {
             }
 
             if (GUILayout.Button(">", GUILayout.Width(30), GUILayout.Height(20))) {
-                _rollbackManager.GoToFrame(_rollbackManager.GetDisplayedFrameNum() + 1, false);
+                _rollbackManager.SetValueFromFrameNumber(_rollbackManager.GetDisplayedFrameNum() + 1, false);
             }
             
             if (GUILayout.Button("=>", GUILayout.Width(30), GUILayout.Height(20))) {
-                _rollbackManager.GoToFrame(_rollbackManager.GetMaxFramesNum() - 1, false);
+                _rollbackManager.SetValueFromFrameNumber(_rollbackManager.GetMaxFramesNum() - 1, false);
             }
             
             EditorGUILayout.EndHorizontal();
         }
         
-        private void DisplayInformations() {
+        private void DisplayRollbackInformations() {
+            GUILayout.Label("Rollback options", EditorStyles.boldLabel);
+            
             EditorGUILayout.BeginHorizontal();
 
-            GUILayout.Label("CurrentFrame", GUILayout.Width(100));
+            GUILayout.Label("Current Frame", GUILayout.Width(100));
             int newFrameNum = (int) GUILayout.HorizontalSlider(_rollbackManager.GetDisplayedFrameNum(), 0,
                 (_rollbackManager.GetMaxFramesNum()));
 
             if (newFrameNum != _rollbackManager.GetDisplayedFrameNum()) {
-                _rollbackManager.GoToFrame(newFrameNum, false);
+                _rollbackManager.SetValueFromFrameNumber(newFrameNum, false);
                 UnityEditor.EditorApplication.isPaused = true;
             }
 
@@ -119,6 +123,7 @@ namespace Packages.EZRollback.Editor {
         }
 
         private void DisplaySimulateOptions() {
+            GUILayout.Label("Simulations options", EditorStyles.boldLabel);
             
             EditorGUILayout.BeginHorizontal();
             _numFramesToSimulate = EditorGUILayout.IntField("Num frames to simulate : ", _numFramesToSimulate);
@@ -140,25 +145,29 @@ namespace Packages.EZRollback.Editor {
 
         private void DisplaySimulateInput() {
             
-            int oldnumOfInputs = _numOfInputs;
-            _numOfInputs = EditorGUILayout.IntField("NumOfInputs : ", _numOfInputs);
-
-            if (_numOfInputs != oldnumOfInputs) {
-                _rbBaseInput = new RollbackInputBaseActions(1 + _numOfInputs / 8);
-            }
+            GUILayout.Label("Input simulations options", EditorStyles.boldLabel);
 
             EditorGUILayout.IntField("ControllerId : ", _controllerId);
             
-            //Vertical input
+            //Vertical axis input
             float verticalValue = _rollbackManager.inputQueue.TransformSByteToAxisValue(_rbBaseInput.verticalValue);
-            verticalValue = EditorGUILayout.Slider("Vertical", verticalValue, -1f, 1f);
+            verticalValue = EditorGUILayout.Slider("Vertical axis", verticalValue, -1f, 1f);
             _rbBaseInput.verticalValue = _rollbackManager.inputQueue.TransformAxisValueToSByte(verticalValue);
             
-            //Vertical input
+            //Vertical axis input
             float horizontalValue = _rollbackManager.inputQueue.TransformSByteToAxisValue(_rbBaseInput.horizontalValue);
-            horizontalValue = EditorGUILayout.Slider("Horizontal", horizontalValue, -1f, 1f);
+            horizontalValue = EditorGUILayout.Slider("Horizontal axis", horizontalValue, -1f, 1f);
             _rbBaseInput.horizontalValue = _rollbackManager.inputQueue.TransformAxisValueToSByte(horizontalValue);
 
+            //Button inputs
+            GUILayout.Label("Buttons press options : ", EditorStyles.boldLabel);
+            int oldNumOfInputs = _numOfInputs;
+            _numOfInputs = EditorGUILayout.IntField("NumOfInputs : ", _numOfInputs);
+            
+            if (_numOfInputs != oldNumOfInputs) {
+                _rbBaseInput = new RollbackInputBaseActions(1 + _numOfInputs / 8);
+            }
+            
             for (int i = 0; i < _numOfInputs; i++) {
                 EditorGUILayout.BeginHorizontal();
                 bool initValue = _rbBaseInput.GetValueBit(i);
@@ -166,7 +175,8 @@ namespace Packages.EZRollback.Editor {
                 _rbBaseInput.SetOrClearBit(i, initValue);
                 EditorGUILayout.EndHorizontal();
             }
-
+            
+            //Correction of inputs
             if (GUILayout.Button("Correct Inputs")) {
                 if (_rollbackManager != null) {
                     

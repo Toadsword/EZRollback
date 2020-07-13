@@ -87,13 +87,13 @@ public abstract class InputQueue : MonoBehaviour
 
     public virtual bool GetInputDown(int actionValue, int controllerId, int frameNumber = -1) {
         frameNumber = CheckFrameNumber(frameNumber);
-        return !_baseActions[controllerId].GetValue(frameNumber).GetValueBit(actionValue) && 
+        return !_baseActions[controllerId].GetValue(frameNumber - 1).GetValueBit(actionValue) && 
                _baseActions[controllerId].value.GetValueBit(actionValue);
     }
     
     public virtual bool GetInputUp(int actionValue, int controllerId, int frameNumber = -1) {
         frameNumber = CheckFrameNumber(frameNumber);
-        return _baseActions[controllerId].GetValue( frameNumber - 1).GetValueBit(actionValue) && 
+        return _baseActions[controllerId].GetValue(frameNumber - 1).GetValueBit(actionValue) && 
                !_baseActions[controllerId].GetValue(frameNumber).GetValueBit(actionValue);
     }
     

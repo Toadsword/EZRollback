@@ -32,12 +32,12 @@ public class RollbackElement<T> {
     }
     
     public T GetValue(int frameNum) {
-        if (frameNum < _size) {
-            return elements[(_tail + frameNum) % elements.Length];
+        if (frameNum == _size || frameNum < 0) {
+            return value;
         }
 
-        if (frameNum == _size) {
-            return value;
+        if (frameNum < _size) {
+            return elements[(_tail + frameNum) % elements.Length];
         }
 
         return default;
