@@ -352,7 +352,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _horizontal: 0
   _vertical: 0
-  baseColor: {r: 0.9427508, g: 1, b: 0, a: 1}
+  _baseColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!212 &1299396096
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -521,7 +521,7 @@ MonoBehaviour:
   registered: 0
   _horizontal: 0
   _vertical: 0
-  baseColor: {r: 1, g: 1, b: 1, a: 1}
+  _baseColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!212 &1494728978
 SpriteRenderer:
   m_ObjectHideFlags: 0

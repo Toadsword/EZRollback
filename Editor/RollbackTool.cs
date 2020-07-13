@@ -7,10 +7,7 @@ using UnityEngine;
 
 namespace Packages.EZRollback.Editor {
         
-    [Serializable]
     public class RollbackTool : EditorWindow {
-        public static RollbackInformation rollbackInformation = new RollbackInformation();
-
         RollbackManager _rollbackManager;
         RollbackInputBaseActions _rbBaseInput;
 
@@ -19,7 +16,7 @@ namespace Packages.EZRollback.Editor {
         
         int _controllerId = 0;
         
-        [MenuItem("RollbackTool/Information")]
+        [MenuItem("RollbackTool/Rollback tool")]
         public static void ShowWindow() {
             GetWindow(typeof(RollbackTool));
         }
@@ -39,13 +36,18 @@ namespace Packages.EZRollback.Editor {
                 DisplaySimulateOptions();
             
                 GUIUtils.GuiLine(3);
-                DisplaySimulateInput();
+                DisplayInputSimulation();
             }
         }
 
+        /**
+         * \brief Called when changing Unity play mode state.
+         */
         private void LogPlayModeState(PlayModeStateChange playModeStateChange) {
             switch (playModeStateChange) {
                 case PlayModeStateChange.EnteredPlayMode:
+                    
+                    //Find or create a RollbackManager
                     _rollbackManager = GameObject.FindObjectOfType<RollbackManager>();
                     if (_rollbackManager == null) {
                         _rollbackManager = Instantiate(Resources.Load("RollbackManagerPrefab") as GameObject, Vector3.zero, Quaternion.identity).GetComponent<RollbackManager>();
@@ -61,16 +63,19 @@ namespace Packages.EZRollback.Editor {
             
             EditorGUILayout.BeginHorizontal();
 
+            //First frame
             if (GUILayout.Button("<=", GUILayout.Width(30), GUILayout.Height(20))) {
                 _rollbackManager.SetValueFromFrameNumber(0, false);
                 UnityEditor.EditorApplication.isPaused = true;
             }
             
+            //Frame before actual one
             if (GUILayout.Button("<", GUILayout.Width(30), GUILayout.Height(20))) {
                 _rollbackManager.SetValueFromFrameNumber(_rollbackManager.GetDisplayedFrameNum() - 1, false);
                 UnityEditor.EditorApplication.isPaused = true;
             }
 
+            //Play/Stop shortcut
             if (UnityEditor.EditorApplication.isPlaying){
                 if (GUILayout.Button("Stop", GUILayout.Width(100), GUILayout.Height(20))) {
                     UnityEditor.EditorApplication.isPlaying = false;
@@ -81,6 +86,7 @@ namespace Packages.EZRollback.Editor {
                 }
             }
 
+            //Pause/Resume shortcut
             if (UnityEditor.EditorApplication.isPaused) {
                 if (GUILayout.Button("Resume", GUILayout.Width(100), GUILayout.Height(20))) {
                     _rollbackManager.SetValueFromFrameNumber(_rollbackManager.GetDisplayedFrameNum(), true);
@@ -92,10 +98,12 @@ namespace Packages.EZRollback.Editor {
                 }
             }
 
+            //Load frame after actual one
             if (GUILayout.Button(">", GUILayout.Width(30), GUILayout.Height(20))) {
                 _rollbackManager.SetValueFromFrameNumber(_rollbackManager.GetDisplayedFrameNum() + 1, false);
             }
             
+            //Load last registered frame
             if (GUILayout.Button("=>", GUILayout.Width(30), GUILayout.Height(20))) {
                 _rollbackManager.SetValueFromFrameNumber(_rollbackManager.GetMaxFramesNum() - 1, false);
             }
@@ -143,21 +151,21 @@ namespace Packages.EZRollback.Editor {
             EditorGUILayout.EndHorizontal();
         }
 
-        private void DisplaySimulateInput() {
+        private void DisplayInputSimulation() {
             
             GUILayout.Label("Input simulations options", EditorStyles.boldLabel);
 
             EditorGUILayout.IntField("ControllerId : ", _controllerId);
             
             //Vertical axis input
-            float verticalValue = _rollbackManager.inputQueue.TransformSByteToAxisValue(_rbBaseInput.verticalValue);
+            float verticalValue = _rbBaseInput.GetVerticalAxis();
             verticalValue = EditorGUILayout.Slider("Vertical axis", verticalValue, -1f, 1f);
-            _rbBaseInput.verticalValue = _rollbackManager.inputQueue.TransformAxisValueToSByte(verticalValue);
+            _rbBaseInput.SetVerticalAxis(verticalValue);
             
             //Vertical axis input
-            float horizontalValue = _rollbackManager.inputQueue.TransformSByteToAxisValue(_rbBaseInput.horizontalValue);
+            float horizontalValue = _rbBaseInput.GetHorizontalAxis();
             horizontalValue = EditorGUILayout.Slider("Horizontal axis", horizontalValue, -1f, 1f);
-            _rbBaseInput.horizontalValue = _rollbackManager.inputQueue.TransformAxisValueToSByte(horizontalValue);
+            _rbBaseInput.SetHorizontalAxis(horizontalValue);
 
             //Button inputs
             GUILayout.Label("Buttons press options : ", EditorStyles.boldLabel);
@@ -171,7 +179,7 @@ namespace Packages.EZRollback.Editor {
             for (int i = 0; i < _numOfInputs; i++) {
                 EditorGUILayout.BeginHorizontal();
                 bool initValue = _rbBaseInput.GetValueBit(i);
-                initValue = EditorGUILayout.Toggle(_rollbackManager.inputQueue.GetActionName(i), initValue);
+                initValue = EditorGUILayout.Toggle(_rollbackManager.GetRBInputManager().GetActionName(i), initValue);
                 _rbBaseInput.SetOrClearBit(i, initValue);
                 EditorGUILayout.EndHorizontal();
             }
@@ -185,7 +193,7 @@ namespace Packages.EZRollback.Editor {
                         rbInputs[i] = _rbBaseInput;
                     }
                     
-                    _rollbackManager.inputQueue.CorrectInputs(_controllerId, _numFramesToSimulate, rbInputs);
+                    _rollbackManager.GetRBInputManager().CorrectInputs(_controllerId, _numFramesToSimulate, rbInputs);
                     _rollbackManager.ReSimulate(_numFramesToSimulate);
                 }
             }

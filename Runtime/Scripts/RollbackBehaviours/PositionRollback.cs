@@ -7,7 +7,10 @@ namespace Packages.EZRollback.Runtime.Scripts.RollbackBehaviours {
 [Serializable]
 public class RollbackElementVector3 : RollbackElement<Vector3> { }
 
-
+/**
+ * PositionRollback
+ * 
+ */
 public class PositionRollback : IRollbackBehaviour {
     [SerializeField] private RollbackElementVector3 positionRB = new RollbackElementVector3();
 

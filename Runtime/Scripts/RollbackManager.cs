@@ -3,8 +3,14 @@ using UnityEngine;
 
 namespace Packages.EZRollback.Runtime.Scripts {
 
+/**
+ * \brief The RollbackManager is main rollback system present in the scene. It is required to allow your scripts to rewind in time.
+ */
     public class RollbackManager : MonoBehaviour {
 
+    /**
+     * \brief _instance is a static variable, allowing any component to access it when needed without the need of a reference
+     */
         public static RollbackManager _instance;
 
         void Awake() {
@@ -18,6 +24,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
         public bool doRollback = false;
         public bool bufferRestriction = false;
         
+        /** ----------------- STATICS -------------------- **/
+        /**
+         * Delegates are created to make a callback to all registered functions when rewinding in time or going forward.
+         */
         public Action prepareInputDelegate;
         
         public static Action simulateDelegate;
@@ -27,13 +37,18 @@ namespace Packages.EZRollback.Runtime.Scripts {
         public static Action<int, bool> deleteFramesDelegate;
         public static Action<int, bool> deleteFramesInputDelegate;
 
-        public InputQueue inputQueue;
+        public static RollbackInputManager rbInputManager;
         
         [SerializeField] int _maxFrameNum = 0;
         [SerializeField] int _displayedFrameNum = 0;
 
-        [SerializeField] int _bufferSize = -1;
+        [SerializeField] public int _bufferSize = -1;
 
+        /* ----- Getter and Setters ------ */
+        public RollbackInputManager GetRBInputManager() {
+            return rbInputManager;
+        }
+        
         public int GetDisplayedFrameNum() {
             return _displayedFrameNum;
         }
@@ -42,30 +57,28 @@ namespace Packages.EZRollback.Runtime.Scripts {
             return _maxFrameNum;
         }
 
-        public int GetBufferSize(int newValue) {
-            return _bufferSize;
-        }
-        
-        public void SetBufferSize(int newValue) {
-            _bufferSize = newValue;
-        }
-
         IRollbackBehaviour[] _rbRegisteredBehaviours;
         void OnEnable() {
-            inputQueue = GetComponent<InputQueue>();
+            rbInputManager = GetComponent<RollbackInputManager>();
 
-            prepareInputDelegate += inputQueue.UpdateInputStatus;
-            saveInputDelegate += inputQueue.SaveFrame;
-            goToFrameDelegate += inputQueue.GoToFrame;
-            deleteFramesInputDelegate += inputQueue.DeleteFrames;
+            //Register the inputs callbacks
+            prepareInputDelegate += rbInputManager.UpdateInputStatus;
+            saveInputDelegate += rbInputManager.SaveFrame;
+            goToFrameDelegate += rbInputManager.SetValueFromFrameNumber;
+            deleteFramesInputDelegate += rbInputManager.DeleteFrames;
         }
         void OnDisable() {
-            prepareInputDelegate -= inputQueue.UpdateInputStatus;
-            saveInputDelegate -= inputQueue.SaveFrame;
-            goToFrameDelegate -= inputQueue.GoToFrame;
-            deleteFramesInputDelegate -= inputQueue.DeleteFrames;
+            //Unregister the inputs callbacks
+            prepareInputDelegate -= rbInputManager.UpdateInputStatus;
+            saveInputDelegate -= rbInputManager.SaveFrame;
+            goToFrameDelegate -= rbInputManager.SetValueFromFrameNumber;
+            deleteFramesInputDelegate -= rbInputManager.DeleteFrames;
         }
-        
+
+        /**
+         * \brief Register an IRollbackBehaviour to the manager's rollback callback
+         * \param rbBehaviour IRollbackBehaviour to register
+         */
         public static void RegisterRollbackBehaviour(IRollbackBehaviour rbBehaviour) {
             if (rbBehaviour.registered)
                 return;
@@ -78,6 +91,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
             rbBehaviour.registered = true;
         }
         
+        /**
+         * \brief Unregister an IRollbackBehaviour from the manager's rollback callback.
+         * \param rbBehaviour IRollbackBehaviour to unregister
+         */
         public static void UnregisterRollbackBehaviour(IRollbackBehaviour rbBehaviour) {
             if (!rbBehaviour.registered)
                 return;
@@ -90,13 +107,11 @@ namespace Packages.EZRollback.Runtime.Scripts {
             rbBehaviour.registered = false;
         }
 
-        // Start is called before the first frame update
         void Start() {
             _displayedFrameNum = 0;
             _maxFrameNum = 0;
         }
 
-        // Update is called once per frame
         void FixedUpdate() {
             if(deleteFramesDelegate == null)
                 return;
@@ -111,6 +126,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
             }
         }
 
+        /**
+         * \brief Setting the current frame as last registered, and delete all future frames currently registered
+         * \param deleteInputs Also delete input frames if true, doesn't otherwise
+         */
         private void SetCurrentFrameAsLastRegistered(bool deleteInputs = true) {
             if (_displayedFrameNum != _maxFrameNum) {
                 //Apply set
@@ -122,10 +141,22 @@ namespace Packages.EZRollback.Runtime.Scripts {
             }
         }
 
+        /**
+         * \brief Get back in x frames
+         * \param numFrames Number of frames to rollback
+         * \param deleteFrames true if we want to delete the frames we rewind.
+         * \param inputsToo along with deleting frames, delete the input frames if true.
+         */
         public void GoBackInFrames(int numFrames, bool deleteFrames = true, bool inputsToo = true) {
             SetValueFromFrameNumber(_displayedFrameNum - numFrames, deleteFrames, inputsToo);
         }
         
+        /**
+         * \brief Get back to a specific frame number
+         * \param frameNumber Frame number wanted
+         * \param deleteFrames true if we want to delete the frames we rewind.
+         * \param inputsToo along with deleting frames, delete the input frames if true.
+         */
         public void SetValueFromFrameNumber(int frameNumber, bool deleteFrames = true, bool inputsToo = true) {
             if (_maxFrameNum < frameNumber || frameNumber < 0)
                 return;
@@ -140,7 +171,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
             }
         }
 
-
+        /**
+         * \brief Save the value of the current frame
+         * \param inputsToo True to save the current state of the inputs, false otherwise. False is used when rewinding frames with calculated new inputs
+         */
         public void SaveCurrentFrame(bool inputsToo = true) {
             //If we try to save a frame while in restored state, we delete the first predicted future
             SetCurrentFrameAsLastRegistered(inputsToo);
@@ -155,7 +189,11 @@ namespace Packages.EZRollback.Runtime.Scripts {
             _maxFrameNum = _displayedFrameNum;
         }
 
-        // From the currently loaded frame, simutate x frames by calling fixed update on all the rollbackElements
+        /**
+         * \brief Simulate a certain number of frames
+         * \param numFrames Number of frames to simulate
+         * \param inputsToo True to save the current state of the inputs, false otherwise. False is used when rewinding frames with calculated new inputs
+         */
         public void Simulate(int numFrames, bool inputsToo = true) {
             SetCurrentFrameAsLastRegistered(inputsToo);
 
@@ -168,12 +206,19 @@ namespace Packages.EZRollback.Runtime.Scripts {
                 SaveCurrentFrame(inputsToo);
             }
         }
-
+        
+        /**
+         * \brief Simulate a certain number of frames, while taking in count the already defined inputs of the players
+         * \param numFrames Number of frames to resimulate
+         */
         public void ReSimulate(int numFrames) {
             GoBackInFrames(numFrames, true, false);
             Simulate(numFrames, false);
         }
 
+        /**
+         * \brief Resize the frame buffer if it exceeds its size
+         */
         private void ManageBufferSize() {
             if (_bufferSize > 0 && _maxFrameNum > _bufferSize) {
                 deleteFramesDelegate.Invoke(1, true);

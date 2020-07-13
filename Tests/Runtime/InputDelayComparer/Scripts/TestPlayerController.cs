@@ -18,7 +18,7 @@ public class TestPlayerController : IRollbackBehaviour
     new void Start() {
         base.Start();
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        RollbackManager._instance.inputQueue.AddController();
+        RollbackManager.rbInputManager.AddPlayer();
     }
     // Update is called once per frame
     void Update() {
@@ -26,20 +26,20 @@ public class TestPlayerController : IRollbackBehaviour
     }
     
     public override void Simulate() {
-        _horizontal = RollbackManager._instance.inputQueue.GetAxis(InputQueue.AxisEnum.HORIZONTAL, 0);
-        _vertical = RollbackManager._instance.inputQueue.GetAxis(InputQueue.AxisEnum.VERTICAL, 0);
+        _horizontal = RollbackManager.rbInputManager.GetAxis(RollbackInputManager.AxisEnum.HORIZONTAL, 0);
+        _vertical = RollbackManager.rbInputManager.GetAxis(RollbackInputManager.AxisEnum.VERTICAL, 0);
         
         _spriteRenderer.color = _baseColor;
-        if (RollbackManager._instance.inputQueue.GetInput(1, 0)) {
-            Debug.Log("Input");
+        if (RollbackManager.rbInputManager.GetInput(1, 0)) {
+            Debug.Log("Input : Cyan");
             _spriteRenderer.color = Color.cyan; 
         }
-        if (RollbackManager._instance.inputQueue.GetInputDown(1, 0)) {
-            Debug.Log("InputDown");
+        if (RollbackManager.rbInputManager.GetInputDown(1, 0)) {
+            Debug.Log("InputDown : Blue");
             _spriteRenderer.color = Color.blue; 
         }
-        if (RollbackManager._instance.inputQueue.GetInputUp(1, 0)) {
-            Debug.Log("InputUp");
+        if (RollbackManager.rbInputManager.GetInputUp(1, 0)) {
+            Debug.Log("InputUp : Green");
             _spriteRenderer.color = Color.green; 
         }
         

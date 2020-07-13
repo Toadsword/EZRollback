@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Packages.EZRollback.Tests.Runtime.InputDelayComparer.Scripts {
 
-public class SampleRollbackInputManager : InputQueue
+public class SampleRollbackInputManager : RollbackInputManager
 {
     protected  override RollbackInputBaseActions GetCurrentActionsValue(int controllerId){
         
@@ -14,8 +14,8 @@ public class SampleRollbackInputManager : InputQueue
         SetBitFromAction(2, KeyCode.S, ref actionsValue);
         SetBitFromAction(3, KeyCode.A, ref actionsValue);
 
-        actionsValue.horizontalValue = TransformAxisValueToSByte(Input.GetAxisRaw("Horizontal"));
-        actionsValue.verticalValue = TransformAxisValueToSByte(Input.GetAxisRaw("Vertical"));
+        actionsValue.SetHorizontalAxis(Input.GetAxisRaw("Horizontal"));
+        actionsValue.SetVerticalAxis(Input.GetAxisRaw("Vertical"));
 
         return actionsValue;
     }
