@@ -14,7 +14,7 @@ public class RollbackElementRollbackInputBaseActions : RollbackElement<RollbackI
 /**
  * \brief Rollback manager that deals with input. Allow registering inputs and rewind them in time.
  */
-public abstract class RollbackInputManager : MonoBehaviour
+public abstract class IRollbackInputManager : MonoBehaviour
 {
     public enum AxisEnum {
         HORIZONTAL,

@@ -37,7 +37,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
         public static Action<int, bool> deleteFramesDelegate;
         public static Action<int, bool> deleteFramesInputDelegate;
 
-        public static RollbackInputManager rbInputManager;
+        public static IRollbackInputManager rbInputManager;
         
         [SerializeField] int _maxFrameNum = 0;
         [SerializeField] int _displayedFrameNum = 0;
@@ -45,7 +45,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
         [SerializeField] public int _bufferSize = -1;
 
         /* ----- Getter and Setters ------ */
-        public RollbackInputManager GetRBInputManager() {
+        public IRollbackInputManager GetRBInputManager() {
             return rbInputManager;
         }
         
@@ -59,7 +59,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
 
         IRollbackBehaviour[] _rbRegisteredBehaviours;
         void OnEnable() {
-            rbInputManager = GetComponent<RollbackInputManager>();
+            rbInputManager = GetComponent<IRollbackInputManager>();
 
             //Register the inputs callbacks
             prepareInputDelegate += rbInputManager.UpdateInputStatus;
