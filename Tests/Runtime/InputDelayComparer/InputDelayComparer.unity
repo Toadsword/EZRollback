@@ -282,7 +282,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   registered: 0
   rotationRB:
-    elements:
+    _history:
     - {x: 0, y: 0, z: 0, w: 0}
     - {x: 0, y: 0, z: 0, w: 0}
     - {x: 0, y: 0, z: 0, w: 0}
@@ -392,7 +392,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: e47f81d0fcff42a4695f942420939b47, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7ac8af9216ad1144cae263421c77dfc5, type: 3}
   m_Color: {r: 0.042452812, g: 1, b: 0.96288735, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -450,7 +450,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   registered: 0
   rotationRB:
-    elements:
+    _history:
     - {x: 0, y: 0, z: 0, w: 0}
     - {x: 0, y: 0, z: 0, w: 0}
     - {x: 0, y: 0, z: 0, w: 0}
@@ -561,7 +561,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: e47f81d0fcff42a4695f942420939b47, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7ac8af9216ad1144cae263421c77dfc5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -688,4 +688,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7da81496eea804bb4be4e0b0bc563f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _baseActions: []
+  _playerInputList: []

@@ -33,7 +33,7 @@ public abstract class IRollbackInputManager : MonoBehaviour
      * \brief Add a player to the list of inputs.
      * \return The number of current players in the list.
      */
-    public int AddPlayer() {
+    public virtual int AddPlayer() {
         _playerInputList.Add(new RollbackElementRollbackInputBaseActions());
         return _playerInputList.Count;
     }
