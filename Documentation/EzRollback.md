@@ -65,17 +65,13 @@ public class RollbackElementSpeedValues : RollbackElement<SpeedValues> { }
 Initialize your sctruct in your class.
 
 ```C#
-[...]
 [SerializeField] public RollbackElementSpeedValues rbElements = new RollbackElementSpeedValues();
-[...]
 ```
 
 Use it how you want
 
 ```C#
-[...]
-float angle = Mathf.Atan2(**rbElements.value.direction.y**, **rbElements.value.direction.x**) * Mathf.Rad2Deg - 90.0f;
-[...]
+float angle = Mathf.Atan2(rbElements.value.direction.y, rbElements.value.direction.x) * Mathf.Rad2Deg - 90.0f;
 ```
 
 Use Simulate instead of FIxed update :
