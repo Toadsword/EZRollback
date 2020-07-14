@@ -7,7 +7,9 @@ This documentation will explain how to use the framework. Before being able to u
 ##Glossary
 
 **Rollback** : Going back in time in the state of the game
+
 **Simulate frames** : Going forward in time. Works like fixed update... But we do it a certain number of time at once.
+
 **Fixed frame** : A frame recorded with the fixed time step of Unity (default : every 0.02Sec)
 
 ##Important scripts
