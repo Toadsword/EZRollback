@@ -1,10 +1,10 @@
-#EZRollback Documentation 
+# EZRollback Documentation 
 
-##Introduction
+## Introduction
 
 This documentation will explain how to use the framework. Before being able to use the rollback in your game engine, the framework will need to know what information need to be stored to perform a rollback and what needs to be executed when simulating frames.
 
-##Glossary
+## Glossary
 
 **Rollback** : Going back in time in the state of the game
 
@@ -12,7 +12,7 @@ This documentation will explain how to use the framework. Before being able to u
 
 **Fixed frame** : A frame recorded with the fixed time step of Unity (default : every 0.02Sec)
 
-##Important scripts
+## Important scripts
 
 **RollbackManager** : The main manager that deals with all the rollback mechanism. Make callbacks at the right time and manage the global status of the frames and the game.
 
@@ -24,13 +24,13 @@ This documentation will explain how to use the framework. Before being able to u
 
 **RollbackInputBaseActions**: Base data structure used to store the input data. Optimised to use the minimum required space for network transfere.
 
-##Example scripts
+## Example scripts
 
 For **IRollbackBehaviour** : PositionRollback and RotationRollback, that implements rollback for the position and the rotation of the linked object.
 
 For **RollbackInputManager** : SampleRollbackInputManager, implementing the basic Unity input system to the needs of the rollback system. Can be found in Tests/Runtime/InputDelayComparer.
 
-##Transitionning your scripts
+## Transitionning your scripts
 
 Basically, you will need to implement what the rollback needs to do on your scripts. For every scripts that changes important values every frames, you will need to replace :
 - **Monobehaviour** with **IRollbackBehaviour**
