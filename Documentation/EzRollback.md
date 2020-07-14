@@ -26,7 +26,7 @@ This documentation will explain how to use the framework. Before being able to u
 
 ## Example scripts
 
-For **IRollbackBehaviour** : PositionRollback and RotationRollback, that implements rollback for the position and the rotation of the linked object.
+For **IRollbackBehaviour** : PositionRollback.cs and RotationRollback.cs, that implements rollback for the position and the rotation of the linked object.
 
 For **RollbackInputManager** : SampleRollbackInputManager, implementing the basic Unity input system to the needs of the rollback system. Can be found in Tests/Runtime/InputDelayComparer.
 
@@ -43,4 +43,76 @@ Basically, you will need to implement what the rollback needs to do on your scri
 		- SaveFrame()
 - **Your input manager** with **IRollbackInputManager** :
 	- Implement GetCurrentActionsValue(), where you store your current inputs from your input manager.
-	- Correct all input uses in your game with the one from the new manager.
+	- Change all input uses in your game with the one from the new manager.
+	
+### Transition examples : 
+Data sctruct to rollback (initially used in your script
+```C#
+public struct SpeedValues {
+    public float currentSpeedo;
+    public float currentSpeedMultiplier;
+    public Vector2 direction;
+}
+```
+
+Make it displayable in editor (not necessary, you can skip this step).
+
+```C#
+[Serializable]
+public class RollbackElementSpeedValues : RollbackElement<SpeedValues> { }
+```
+
+Initialize your sctruct in your class.
+
+```C#
+[...]
+[SerializeField] public RollbackElementSpeedValues rbElements = new RollbackElementSpeedValues();
+[...]
+```
+
+Use it how you want
+
+```C#
+[...]
+float angle = Mathf.Atan2(**rbElements.value.direction.y**, **rbElements.value.direction.x**) * Mathf.Rad2Deg - 90.0f;
+[...]
+```
+
+Use Simulate instead of FIxed update :
+
+```C#
+public override void Simulate() {
+	MoveSpaceship(transform.position);
+}
+```
+
+Implement the other functions by registering your RollbackElements inside of them :
+
+```C#
+public override void SetValueFromFrameNumber(int frameNumber) {
+	rbElements.SetValueFromFrameNumber(frameNumber);
+}
+
+public override void DeleteFrames(int numFramesToDelete, bool fromFrames) {
+	rbElements.DeleteFrames(numFramesToDelete, fromFrames);
+}
+
+public override void SaveFrame() {
+	rbElements.SaveFrame();
+}
+```
+
+If you're using a component from Unity to store its value, you can achieve it by doing so : 
+
+```C#
+public override void SetValueFromFrameNumber(int frameNumber) {
+	_colors.SetValueFromFrameNumber(frameNumber);
+	_spriteRenderer.color = _colors.value;
+}
+
+public override void SaveFrame() {
+	_colors.value = _spriteRenderer.color;
+	_colors.SaveFrame();
+}
+```
+
