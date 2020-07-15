@@ -15,8 +15,7 @@ public class TestPlayerController : IRollbackBehaviour
 
     RollbackElement<Color> _colors = new RollbackElement<Color>();
     
-    new void Start() {
-        base.Start();
+    void Start() {
         _spriteRenderer = GetComponent<SpriteRenderer>();
         RollbackManager.rbInputManager.AddPlayer();
     }
@@ -54,8 +53,8 @@ public class TestPlayerController : IRollbackBehaviour
         _spriteRenderer.color = _colors.value;
     }
 
-    public override void DeleteFrames(int numFramesToDelete, bool firstFrames) {
-        _colors.DeleteFrames(numFramesToDelete, firstFrames);
+    public override void DeleteFrames(int numFramesToDelete, RollbackManager.DeleteFrameMode deleteMode) {
+        _colors.DeleteFrames(numFramesToDelete, deleteMode);
     }
 
     public override void SaveFrame() {

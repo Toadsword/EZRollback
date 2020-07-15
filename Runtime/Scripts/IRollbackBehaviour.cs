@@ -15,19 +15,22 @@ public abstract class IRollbackBehaviour : MonoBehaviour {
      */
     public bool registered = false;
     
-    /**
-     * \brief Start is called when the object is created and first launched in the scene
-     */
-    public void Start() {
+    
+    public void Awake() {
+     RollbackManager.RegisterRollbackBehaviour(this);
+    }
+
+    public void OnDestroy() {
+     RollbackManager.RegisterRollbackBehaviour(this);
+    }
+    /*
+    public void OnEnable() {
         RollbackManager.RegisterRollbackBehaviour(this);
     }
 
-    /**
-     * \brief OnDestroy is called when the object is destroyed
-     */
-    public void OnDestroy() {
+    public void OnDisable() {
         RollbackManager.UnregisterRollbackBehaviour(this);
-    }
+    }*/
     
     /**
      * \brief Simulate is called each FixedUpdate(). Execute the code that should be executed each fixed frame.
@@ -46,10 +49,10 @@ public abstract class IRollbackBehaviour : MonoBehaviour {
     /**
      * \brief Delete frames that are no longer useful to the rollback system.
      * \param numFramesToDelete Number of frames to delete at once.
-     * \param firstFrames True to remove x first frames, false to remove x last frames.
+     * \param deleteMode Delete mode of the frames
      * Implementation detail : For every RollbackElement<> present in your script, call the DeleteFrames function of it.
      */
-    public abstract void DeleteFrames(int numFramesToDelete, bool firstFrames);
+    public abstract void DeleteFrames(int numFramesToDelete,  RollbackManager.DeleteFrameMode deleteMode);
 
     /**
      * \brief Save the current frame value in the history.

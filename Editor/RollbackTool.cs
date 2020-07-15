@@ -30,7 +30,7 @@ namespace Packages.EZRollback.Editor {
 
             if (UnityEditor.EditorApplication.isPlaying && _rollbackManager != null) {
                 GUIUtils.GuiLine(3);
-                DisplayRollbackInformations();
+                DisplayRollbackInformation();
 
                 GUIUtils.GuiLine(3);
                 DisplaySimulateOptions();
@@ -111,14 +111,13 @@ namespace Packages.EZRollback.Editor {
             EditorGUILayout.EndHorizontal();
         }
         
-        private void DisplayRollbackInformations() {
+        private void DisplayRollbackInformation() {
             GUILayout.Label("Rollback options", EditorStyles.boldLabel);
             
             EditorGUILayout.BeginHorizontal();
 
             GUILayout.Label("Current Frame", GUILayout.Width(100));
-            int newFrameNum = (int) GUILayout.HorizontalSlider(_rollbackManager.GetDisplayedFrameNum(), 0,
-                (_rollbackManager.GetMaxFramesNum()));
+            int newFrameNum = (int) GUILayout.HorizontalSlider(_rollbackManager.GetDisplayedFrameNum(), 0, _rollbackManager.GetMaxFramesNum());
 
             if (newFrameNum != _rollbackManager.GetDisplayedFrameNum()) {
                 _rollbackManager.SetValueFromFrameNumber(newFrameNum, false);

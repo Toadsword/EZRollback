@@ -18,8 +18,8 @@ public class PositionRollback : IRollbackBehaviour {
         transform.position = positionRB.value;
     }
 
-    public override void DeleteFrames(int numFramesToDelete, bool firstFrames) {
-        positionRB.DeleteFrames(numFramesToDelete, firstFrames);
+    public override void DeleteFrames(int numFramesToDelete, RollbackManager.DeleteFrameMode deleteFrameMode) {
+        positionRB.DeleteFrames(numFramesToDelete, deleteFrameMode);
     }
 
     public override void SaveFrame() {

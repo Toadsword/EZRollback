@@ -8,6 +8,12 @@ namespace Packages.EZRollback.Runtime.Scripts {
  */
     public class RollbackManager : MonoBehaviour {
 
+    public enum DeleteFrameMode {
+        FIRST_FRAMES,
+        LAST_FRAMES,
+        FIT_TO_BUFFER
+    }
+    
     /**
      * \brief _instance is a static variable, allowing any component to access it when needed without the need of a reference
      */
@@ -34,19 +40,23 @@ namespace Packages.EZRollback.Runtime.Scripts {
         public static Action saveDelegate;
         public static Action saveInputDelegate;
         public static Action<int> goToFrameDelegate;
-        public static Action<int, bool> deleteFramesDelegate;
-        public static Action<int, bool> deleteFramesInputDelegate;
+        public static Action<int, DeleteFrameMode> deleteFramesDelegate;
+        public static Action<int, DeleteFrameMode> deleteFramesInputDelegate;
 
         public static IRollbackInputManager rbInputManager;
         
         [SerializeField] int _maxFrameNum = 0;
         [SerializeField] int _displayedFrameNum = 0;
 
-        [SerializeField] public int _bufferSize = -1;
+        [SerializeField] int _bufferSize = -1;
 
         /* ----- Getter and Setters ------ */
         public IRollbackInputManager GetRBInputManager() {
             return rbInputManager;
+        }
+
+        public int GetBufferSize() {
+            return _bufferSize;
         }
         
         public int GetDisplayedFrameNum() {
@@ -133,10 +143,11 @@ namespace Packages.EZRollback.Runtime.Scripts {
         private void SetCurrentFrameAsLastRegistered(bool deleteInputs = true) {
             if (_displayedFrameNum != _maxFrameNum) {
                 //Apply set
-                deleteFramesDelegate.Invoke(_maxFrameNum - _displayedFrameNum, false);
+                deleteFramesDelegate.Invoke(_maxFrameNum - _displayedFrameNum, DeleteFrameMode.LAST_FRAMES);
                 if (deleteInputs) {
-                    deleteFramesInputDelegate.Invoke(_maxFrameNum - _displayedFrameNum, false);
+                    deleteFramesInputDelegate.Invoke(_maxFrameNum - _displayedFrameNum, DeleteFrameMode.LAST_FRAMES);
                 }
+                
                 _maxFrameNum = _displayedFrameNum;
             }
         }
@@ -148,7 +159,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
          * \param inputsToo along with deleting frames, delete the input frames if true.
          */
         public void GoBackInFrames(int numFrames, bool deleteFrames = true, bool inputsToo = true) {
-            SetValueFromFrameNumber(_displayedFrameNum - numFrames, deleteFrames, inputsToo);
+            SetValueFromFrameNumber(GetDisplayedFrameNum() - numFrames, deleteFrames, inputsToo);
         }
         
         /**
@@ -221,8 +232,8 @@ namespace Packages.EZRollback.Runtime.Scripts {
          */
         private void ManageBufferSize() {
             if (_bufferSize > 0 && _maxFrameNum > _bufferSize) {
-                deleteFramesDelegate.Invoke(1, true);
-                deleteFramesInputDelegate.Invoke(1, true);
+                deleteFramesDelegate.Invoke(1, DeleteFrameMode.FIT_TO_BUFFER);
+                deleteFramesInputDelegate.Invoke(1, DeleteFrameMode.FIT_TO_BUFFER);
 
                 _maxFrameNum = _bufferSize;
                 _displayedFrameNum = _maxFrameNum;

@@ -95,9 +95,9 @@ public abstract class IRollbackInputManager : MonoBehaviour
      * \param numFramesToDelete Number of frames to delete
      * \param bool True to delete the x first frames, False to delete the x last frames registered
      */
-    public void DeleteFrames(int numFramesToDelete, bool firstFrames) {
+    public void DeleteFrames(int numFramesToDelete, RollbackManager.DeleteFrameMode deleteMode) {
         for (int i = 0; i < _playerInputList.Count; i++) {
-            _playerInputList[i].DeleteFrames(numFramesToDelete, firstFrames);
+            _playerInputList[i].DeleteFrames(numFramesToDelete, deleteMode);
         }
     }
     

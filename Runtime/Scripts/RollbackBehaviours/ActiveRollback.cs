@@ -4,10 +4,12 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Packages.EZRollback.Runtime.Scripts.RollbackBehaviours {
+[Serializable]
+public class RollbackElementBool : RollbackElement<bool> { }
 
 public class ActiveRollback : IRollbackBehaviour {
-    [SerializeField] RollbackElement<bool> _isActiveRb = new RollbackElement<bool>();
-
+    [SerializeField] RollbackElementBool _isActiveRb = new RollbackElementBool();
+    
     public override void Simulate() { }
 
     public override void SetValueFromFrameNumber(int frameNumber) {
@@ -15,8 +17,8 @@ public class ActiveRollback : IRollbackBehaviour {
         gameObject.SetActive(_isActiveRb.value);
     }
 
-    public override void DeleteFrames(int numFramesToDelete, bool firstFrames) {
-        _isActiveRb.DeleteFrames(numFramesToDelete, firstFrames);
+    public override void DeleteFrames(int numFramesToDelete, RollbackManager.DeleteFrameMode deleteMode) {
+        _isActiveRb.DeleteFrames(numFramesToDelete, deleteMode);
     }
 
     public override void SaveFrame() {
