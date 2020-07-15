@@ -5,7 +5,7 @@ using Packages.EZRollback.Runtime.Scripts;
 using UnityEditor;
 using UnityEngine;
 
-public class TestPlayerController : IRollbackBehaviour
+public class TestPlayerController : RollbackBehaviour
 {
     [SerializeField] private float _horizontal = 0.0f;
     [SerializeField] private float _vertical = 0.0f;
@@ -25,8 +25,8 @@ public class TestPlayerController : IRollbackBehaviour
     }
     
     public override void Simulate() {
-        _horizontal = RollbackManager.rbInputManager.GetAxis(IRollbackInputManager.AxisEnum.HORIZONTAL, 0);
-        _vertical = RollbackManager.rbInputManager.GetAxis(IRollbackInputManager.AxisEnum.VERTICAL, 0);
+        _horizontal = RollbackManager.rbInputManager.GetAxis(RollbackInputManager.AxisEnum.HORIZONTAL, 0);
+        _vertical = RollbackManager.rbInputManager.GetAxis(RollbackInputManager.AxisEnum.VERTICAL, 0);
         
         _spriteRenderer.color = _baseColor;
         if (RollbackManager.rbInputManager.GetInput(1, 0)) {

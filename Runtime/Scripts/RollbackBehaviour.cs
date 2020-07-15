@@ -8,7 +8,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
  * \brief Class-Interface inherited by MonoBehavior that asks to implement all the necessary functions to include rollback in the script.
  */
 [Serializable]
-public abstract class IRollbackBehaviour : MonoBehaviour {
+public abstract class RollbackBehaviour : MonoBehaviour {
 
     /**
      * \brief variable to track if the current IRollbackBehaviour is registered in the RollbackManager or not

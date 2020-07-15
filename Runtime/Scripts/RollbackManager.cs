@@ -43,7 +43,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
         public static Action<int, DeleteFrameMode> deleteFramesDelegate;
         public static Action<int, DeleteFrameMode> deleteFramesInputDelegate;
 
-        public static IRollbackInputManager rbInputManager;
+        public static RollbackInputManager rbInputManager;
         
         [SerializeField] int _maxFrameNum = 0;
         [SerializeField] int _displayedFrameNum = 0;
@@ -51,7 +51,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
         [SerializeField] int _bufferSize = -1;
 
         /* ----- Getter and Setters ------ */
-        public IRollbackInputManager GetRBInputManager() {
+        public RollbackInputManager GetRBInputManager() {
             return rbInputManager;
         }
 
@@ -67,9 +67,9 @@ namespace Packages.EZRollback.Runtime.Scripts {
             return _maxFrameNum;
         }
 
-        IRollbackBehaviour[] _rbRegisteredBehaviours;
+        RollbackBehaviour[] _rbRegisteredBehaviours;
         void OnEnable() {
-            rbInputManager = GetComponent<IRollbackInputManager>();
+            rbInputManager = GetComponent<RollbackInputManager>();
 
             //Register the inputs callbacks
             prepareInputDelegate += rbInputManager.UpdateInputStatus;
@@ -86,10 +86,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
         }
 
         /**
-         * \brief Register an IRollbackBehaviour to the manager's rollback callback
-         * \param rbBehaviour IRollbackBehaviour to register
+         * \brief Register an RollbackBehaviour to the manager's rollback callback
+         * \param rbBehaviour RollbackBehaviour to register
          */
-        public static void RegisterRollbackBehaviour(IRollbackBehaviour rbBehaviour) {
+        public static void RegisterRollbackBehaviour(RollbackBehaviour rbBehaviour) {
             if (rbBehaviour.registered)
                 return;
             
@@ -102,10 +102,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
         }
         
         /**
-         * \brief Unregister an IRollbackBehaviour from the manager's rollback callback.
-         * \param rbBehaviour IRollbackBehaviour to unregister
+         * \brief Unregister an RollbackBehaviour from the manager's rollback callback.
+         * \param rbBehaviour RollbackBehaviour to unregister
          */
-        public static void UnregisterRollbackBehaviour(IRollbackBehaviour rbBehaviour) {
+        public static void UnregisterRollbackBehaviour(RollbackBehaviour rbBehaviour) {
             if (!rbBehaviour.registered)
                 return;
             

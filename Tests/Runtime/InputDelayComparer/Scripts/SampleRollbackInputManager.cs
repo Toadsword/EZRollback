@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Packages.EZRollback.Tests.Runtime.InputDelayComparer.Scripts {
 
-public class SampleRollbackInputManager : IRollbackInputManager
+public class SampleRollbackInputManager : RollbackInputManager
 {
     protected  override RollbackInputBaseActions GetCurrentActionsValue(int controllerId){
         

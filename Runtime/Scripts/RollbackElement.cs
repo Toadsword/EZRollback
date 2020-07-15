@@ -87,6 +87,10 @@ public class RollbackElement<T> {
             Debug.LogError("Cannot go back from higher number of registered frames");
             return;
         }
+
+        if (frameNum == _size) {
+            frameNum--;
+        }
         
         value = _history[GetCorrectFrameNumber(frameNum)];
     }

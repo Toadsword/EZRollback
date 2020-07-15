@@ -7,7 +7,7 @@ namespace Packages.EZRollback.Runtime.Scripts.RollbackBehaviours {
 [Serializable]
 public class RollbackElementBool : RollbackElement<bool> { }
 
-public class ActiveRollback : IRollbackBehaviour {
+public class ActiveRollback : RollbackBehaviour {
     [SerializeField] RollbackElementBool _isActiveRb = new RollbackElementBool();
     
     public override void Simulate() { }

@@ -7,7 +7,7 @@ namespace Packages.EZRollback.Runtime.Scripts.RollbackBehaviours {
 [Serializable]
 public class RollbackElementQuaternion : RollbackElement<Quaternion> { }
 
-public class RotationRollback : IRollbackBehaviour {
+public class RotationRollback : RollbackBehaviour {
     [SerializeField] RollbackElementQuaternion rotationRB = new RollbackElementQuaternion();
     
     public override void Simulate() {
