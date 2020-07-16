@@ -3,6 +3,7 @@ using System.IO;
 using Packages.EZRollback.Editor.Utils;
 using Packages.EZRollback.Runtime.Scripts;
 using UnityEditor;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 namespace Packages.EZRollback.Editor {
@@ -15,6 +16,10 @@ namespace Packages.EZRollback.Editor {
         int _numFramesToSimulate = 0;
         
         int _controllerId = 0;
+
+        Vector2 _scrollPos = Vector2.zero;
+
+        EditorWindow _window;
         
         [MenuItem("RollbackTool/Rollback tool")]
         public static void ShowWindow() {
@@ -26,6 +31,12 @@ namespace Packages.EZRollback.Editor {
         }
 
         void OnGUI() {
+            if (_window == null) {
+                _window = GetWindow(typeof(RollbackTool));
+            }
+            
+            _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos, GUILayout.Width(_window.position.width), GUILayout.Height(_window.position.height));
+        
             DisplayRollbackEditionButtons();
 
             if (UnityEditor.EditorApplication.isPlaying && _rollbackManager != null) {
@@ -38,6 +49,7 @@ namespace Packages.EZRollback.Editor {
                 GUIUtils.GuiLine(3);
                 DisplayInputSimulation();
             }
+            EditorGUILayout.EndScrollView();
         }
 
         /**
