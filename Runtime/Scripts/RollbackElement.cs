@@ -83,16 +83,16 @@ public class RollbackElement<T> {
      * \brief Restore the current value to an anterior frame.
      */
     public void SetValueFromFrameNumber(int frameNum) {
-        if (0 > frameNum) {
-            Debug.LogError("Cannot go back from higher number of registered frames");
-            return;
+        if (1 > frameNum) {
+            Debug.LogWarning("Cannot go back from higher number of registered frames. Returning last");
+            frameNum = 1;
         }
 
         if (frameNum == _size) {
             frameNum--;
         }
         
-        value = _history[GetCorrectFrameNumber(frameNum)];
+        value = _history[GetCorrectFrameNumber(frameNum - 1)];
     }
     
     /**

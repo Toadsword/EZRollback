@@ -19,6 +19,8 @@ namespace Packages.EZRollback.Editor {
 
         Vector2 _scrollPos = Vector2.zero;
 
+        System.TimeSpan _spentTimeToResimulate;
+
         EditorWindow _window;
         
         [MenuItem("RollbackTool/Rollback tool")]
@@ -204,9 +206,15 @@ namespace Packages.EZRollback.Editor {
                         rbInputs[i] = _rbBaseInput;
                     }
                     
+                    DateTime currentTime = System.DateTime.Now;
                     _rollbackManager.GetRBInputManager().CorrectInputs(_controllerId, _numFramesToSimulate, rbInputs);
                     _rollbackManager.ReSimulate(_numFramesToSimulate);
+                    _spentTimeToResimulate = System.DateTime.Now - currentTime;
                 }
+            }
+
+            if (_spentTimeToResimulate != null) {
+                GUILayout.Label("Time to resimulate " + _numFramesToSimulate + " frames : " + _spentTimeToResimulate.TotalMilliseconds + "ms.");
             }
         }
     }
