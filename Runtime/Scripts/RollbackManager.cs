@@ -202,7 +202,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
             }
             
             _displayedFrameNum++;
-            Debug.Log("_displayedFrameNum : " + _displayedFrameNum);
+//            Debug.Log("_displayedFrameNum : " + _displayedFrameNum);
             _maxFrameNum = _displayedFrameNum;
         }
 

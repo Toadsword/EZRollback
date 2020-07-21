@@ -41,8 +41,11 @@ public class RollbackElement<T> {
         if (frameNum == _size || frameNum == 0) {
             return value;
         }
-
+        
         if (frameNum < _size) {
+            if (frameNum < 0) {
+                frameNum = _size - 1;
+            }
             return _history[GetCorrectFrameNumber(frameNum)];
         }
 
@@ -92,7 +95,7 @@ public class RollbackElement<T> {
             frameNum--;
         }
         
-        value = _history[GetCorrectFrameNumber(frameNum - 1)];
+        value = GetValue(frameNum - 1);
     }
     
     /**

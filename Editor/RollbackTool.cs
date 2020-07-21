@@ -9,6 +9,9 @@ using UnityEngine;
 namespace Packages.EZRollback.Editor {
         
     public class RollbackTool : EditorWindow {
+        
+        const int FIRST_FRAME_NUM = 1;
+        
         RollbackManager _rollbackManager;
         RollbackInputBaseActions _rbBaseInput;
 
@@ -79,7 +82,7 @@ namespace Packages.EZRollback.Editor {
 
             //First frame
             if (GUILayout.Button("<=", GUILayout.Width(30), GUILayout.Height(20))) {
-                _rollbackManager.SetValueFromFrameNumber(0, false);
+                _rollbackManager.SetValueFromFrameNumber(FIRST_FRAME_NUM, false);
                 UnityEditor.EditorApplication.isPaused = true;
             }
             
@@ -131,7 +134,7 @@ namespace Packages.EZRollback.Editor {
             EditorGUILayout.BeginHorizontal();
 
             GUILayout.Label("Current Frame", GUILayout.Width(100));
-            int newFrameNum = (int) GUILayout.HorizontalSlider(_rollbackManager.GetDisplayedFrameNum(), 0, _rollbackManager.GetMaxFramesNum());
+            int newFrameNum = (int) GUILayout.HorizontalSlider(_rollbackManager.GetDisplayedFrameNum(), FIRST_FRAME_NUM, _rollbackManager.GetMaxFramesNum());
 
             if (newFrameNum != _rollbackManager.GetDisplayedFrameNum()) {
                 _rollbackManager.SetValueFromFrameNumber(newFrameNum, false);
