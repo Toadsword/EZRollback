@@ -71,36 +71,7 @@ public abstract class RollbackInputManager : MonoBehaviour
             _playerInputList[i].value = actionsValue;
         }
     }
-    
-    /**
-     * \brief Save the inputs of all the players of the current frames.
-     */
-    public void SaveFrame() {
-        for (int i = 0; i < _playerInputList.Count; i++) {
-            _playerInputList[i].SaveFrame();
-        }
-    }
-    
-    /**
-     * \brief Save the inputs of all the players of the current frames.
-     */
-    public void SetValueFromFrameNumber(int frameNumber) {
-        for (int i = 0; i < _playerInputList.Count; i++) {
-            _playerInputList[i].SetValueFromFrameNumber(frameNumber);
-        }
-    }
-    
-    /**
-     * \brief Delete a certain number of frames for all the players
-     * \param numFramesToDelete Number of frames to delete
-     * \param bool True to delete the x first frames, False to delete the x last frames registered
-     */
-    public void DeleteFrames(int numFramesToDelete, RollbackManager.DeleteFrameMode deleteMode) {
-        for (int i = 0; i < _playerInputList.Count; i++) {
-            _playerInputList[i].DeleteFrames(numFramesToDelete, deleteMode);
-        }
-    }
-    
+ 
     /**
      * \brief Get the value of the requested axis, of a playerId to a certain frame.
      * This function can be overwritten to include more axis
@@ -207,5 +178,36 @@ public abstract class RollbackInputManager : MonoBehaviour
 
         return frameNumber;
     }
+    
+       
+    /**
+     * \brief Save the inputs of all the players of the current frames.
+     */
+    public void SaveFrame() {
+        for (int i = 0; i < _playerInputList.Count; i++) {
+            _playerInputList[i].SaveFrame();
+        }
+    }
+    
+    /**
+     * \brief Save the inputs of all the players of the current frames.
+     */
+    public void SetValueFromFrameNumber(int frameNumber) {
+        for (int i = 0; i < _playerInputList.Count; i++) {
+            _playerInputList[i].SetValueFromFrameNumber(frameNumber);
+        }
+    }
+    
+    /**
+     * \brief Delete a certain number of frames for all the players
+     * \param numFramesToDelete Number of frames to delete
+     * \param bool True to delete the x first frames, False to delete the x last frames registered
+     */
+    public void DeleteFrames(int numFramesToDelete, RollbackManager.DeleteFrameMode deleteMode) {
+        for (int i = 0; i < _playerInputList.Count; i++) {
+            _playerInputList[i].DeleteFrames(numFramesToDelete, deleteMode);
+        }
+    }
+
 }
 }

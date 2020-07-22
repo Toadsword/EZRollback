@@ -27,6 +27,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
             }
         }
 
+        [SerializeField] bool _displayDebugOnScreen = false;
         public bool doRollback = false;
         public bool bufferRestriction = false;
         
@@ -161,9 +162,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
          * \param inputsToo along with deleting frames, delete the input frames if true.
          */
         public void GoBackInFrames(int numFrames, bool deleteFrames = true, bool inputsToo = true) {
-            Debug.Log("Going back to frame : " + (GetDisplayedFrameNum() - numFrames));
             SetValueFromFrameNumber(GetDisplayedFrameNum() - numFrames, deleteFrames, inputsToo);
-            Debug.Log("New frame number : " + GetDisplayedFrameNum());
         }
         
         /**

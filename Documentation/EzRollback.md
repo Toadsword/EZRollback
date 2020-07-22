@@ -1,4 +1,5 @@
 
+
 # EZRollback Documentation 
 
 ## Introduction
@@ -22,19 +23,24 @@ The goal of the framework is to enable the possibility to implement a rollback s
 
 ## Important scripts
 
+### Abstract classes
+To implement the rollback in your game, you will mainly inherite those classes to your scripts :
+
+**RollbackBehaviour** : Abstract class, inheriting from Monobehaviour, that implements all the required functions from the rollbackmanager callbacks.
+
+**RollbackInputManager** : Complement abstract manager that stores player's inputs and rollback them. Is necessary to use rollback in your game for inputs(for networking for example). Have extra functions that allow input correction for players.
+
+### Other scripts
+
 **RollbackManager** : The main manager that deals with all the rollback mechanism. Make callbacks at the right time and manage the global status of the frames and the game.
 
-**IRollbackBehaviour** : Abstract class, inheriting from Monobehaviour, that implements all the required functions from the rollbackmanager callbacks.
+**RollbackElement< T >** : Data structures conveniently designed to store all the information the rollback system need about your variable. Use preferably with a struct to optimize its use.
 
-**IRollbackInputManager** : Complement abstract manager that stores player's inputs and rollback them. Is necessary to use rollback in your game for inputs(for networking for example). Have extra functions that allow input correction for players.
-
-**RollbackElement<T>** : Data structures conveniently designed to store all the information the rollback system need about your variable.
-
-**RollbackInputBaseActions**: Base data structure used to store the input data. Optimised to use the minimum required space for network transfere.
+**RollbackInputBaseActions** : Base data structure used to store the input data. Optimised to use the minimum required space for network transfere.
 
 ## Example scripts
 
-For **IRollbackBehaviour** : 
+For **RollbackBehaviour** : 
 
 - PositionRollback.cs 
 - RotationRollback.cs
@@ -49,21 +55,52 @@ Can be found in Tests/Runtime/InputDelayComparer.
 
 ## Transitionning your scripts
 
+### **Monobehaviour** with **RollbackBehaviour**
+
 Basically, you will need to implement what the rollback needs to do on your scripts. For every scripts that changes important values every frames, you will need to replace :
-- **Monobehaviour** with **IRollbackBehaviour**
-	- Implement the asked functions 
-	- Put all the Update/Fixed update needs into the Simulate(). Simulate will be called every fixed update. Puting all the update information into Simulate works too, as the rollbackManager only registers in history every fixed time step.
-	- Put your rollbackable variable into a defined struct. Create that struct with the RollbackElement<> wrapper.
-	- Call the right functions at the right time with the overriden functions from IRollbackBehaviour
-		- SetValueFromFrameNumber()
-		- DeleteFrames()
-		- SaveFrame()
-- **Your input manager** with **IRollbackInputManager** :
-	- Implement GetCurrentActionsValue(), where you store your current inputs from your input manager.
+- Implement the abstract functions from RollbackBehaviour
+	- Simulate()
+		- **Replaces FixedUpdate()**
+		- Is called every fixed update, and when simulating back frames.
+	- SetValueFromFrameNumber(int frameNumber)
+	- DeleteFrames(int numFramesToDelete,RollbackManager.DeleteFrameMode deleteMode)
+	- SaveFrame() 
+- Put your rollbackable variable into a defined struct. Create that struct with the RollbackElement<> wrapper.
+```C#
+public struct SpeedValues {
+    public float currentSpeedo;
+    public float currentSpeedMultiplier;
+    public Vector2 direction;
+}
+
+[...]
+
+public RollbackElement<SpeedValues> rbElements = new RollbackElement<SpeedValues>();
+```
+Put all the Update/Fixed update needs into the Simulate(). Simulate will be called every fixed update. Puting all the update information into Simulate works too, as the rollbackManager only registers in history every fixed time step.
+
+```C#
+// Use this instead of FixedUpdate()
+public override void Simulate() {
+	//Your code here
+}
+```
+**Don't use Time.deltatime in the Simulate function.** If you use it, rather use *Time.fixedtimestep* in your Simulate() function. You still can use time.deltatime with your Update() loop, but be aware that you cannot use Time.deltaTime in the Simulate() function.
+
+### **Your input manager** with **RollbackInputManager** :
+- Implement the asbtract function : GetCurrentActionsValue(), where you store your current inputs from your input manager.
+	- You can implement virtual functions depending to your needs :
+		- void UpdateInputStatus()
+		- float **GetAxis**(AxisEnum axis, int playerId, int frameNumber = -1)
+		- bool **GetInput**(int actionValue, int playerId, int frameNumber = -1)
+		- bool **GetInputDown**(int actionValue, int playerId, int frameNumber = -1)
+		- bool **GetInputUp**(int actionValue, int playerId, int frameNumber = -1)
+		- string **GetActionName**(int actionIndex)
+			- I recommend implementing this one, for debug purposes.
 	- Change all input uses in your game with the one from the new manager.
 	
 ### Transition examples : 
-Data sctruct to rollback (initially used in your script
+Data sctruct to rollback of your class (initially used in your script)
 ```C#
 public struct SpeedValues {
     public float currentSpeedo;
@@ -85,18 +122,10 @@ Initialize your sctruct in your class.
 [SerializeField] public RollbackElementSpeedValues rbElements = new RollbackElementSpeedValues();
 ```
 
-Use it how you want
+Access your original value through **.value**. The wrapper behind stores an history of that value for the rollback.
 
 ```C#
 float angle = Mathf.Atan2(rbElements.value.direction.y, rbElements.value.direction.x) * Mathf.Rad2Deg - 90.0f;
-```
-
-Use Simulate instead of FIxed update :
-
-```C#
-public override void Simulate() {
-	MoveSpaceship(transform.position);
-}
 ```
 
 Implement the other functions by registering your RollbackElements inside of them :
@@ -133,5 +162,5 @@ public override void SaveFrame() {
 **Don't use Time.deltatime in the Simulate function.** 
 Rather use Time.fixedtimestep, else your scripts won't work when simulating frames.
 
-**If implementing online, be aware of time synchronization.**
+**If implementing online, be aware of time synchronization.**. Have a way to know when to start recording rollback in your game, and when to stop.
 
