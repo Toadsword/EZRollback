@@ -1,8 +1,16 @@
+
 # EZRollback Documentation 
 
 ## Introduction
 
 This documentation will explain how to use the framework. Before being able to use the rollback in your game engine, the framework will need to know what information need to be stored to perform a rollback and what needs to be executed when simulating frames.
+
+The goal of the framework is to enable the possibility to implement a rollback system in your Unity game. The uses are multiple :
+- Debug purpose to have informations for each frames
+- Implement an online game using rollback
+- Have a replay system in your game
+
+![Gif showing the use of a rollback system in a simple game](./img/RollbackIntroduction.gif)
 
 ## Glossary
 
@@ -26,9 +34,18 @@ This documentation will explain how to use the framework. Before being able to u
 
 ## Example scripts
 
-For **IRollbackBehaviour** : PositionRollback.cs and RotationRollback.cs, that implements rollback for the position and the rotation of the linked object.
+For **IRollbackBehaviour** : 
 
-For **RollbackInputManager** : SampleRollbackInputManager, implementing the basic Unity input system to the needs of the rollback system. Can be found in Tests/Runtime/InputDelayComparer.
+- PositionRollback.cs 
+- RotationRollback.cs
+
+Implements rollback for the position and the rotation of the linked GameObject.
+
+For **RollbackInputManager** : 
+- SampleRollbackInputManager
+
+Implementing the basic Unity input system to the needs of the rollback system. 
+Can be found in Tests/Runtime/InputDelayComparer.
 
 ## Transitionning your scripts
 
@@ -111,4 +128,10 @@ public override void SaveFrame() {
 	_colors.SaveFrame();
 }
 ```
+
+## Things to be aware of
+**Don't use Time.deltatime in the Simulate function.** 
+Rather use Time.fixedtimestep, else your scripts won't work when simulating frames.
+
+**If implementing online, be aware of time synchronization.**
 
