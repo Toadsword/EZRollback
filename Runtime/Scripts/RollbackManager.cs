@@ -33,10 +33,11 @@ namespace Packages.EZRollback.Runtime.Scripts {
         
         /** ----------------- STATICS -------------------- **/
         /**
-         * Delegates are created to make a callback to all registered functions when rewinding in time or going forward.
+         * Delegate?s are created to make a callback to all registered functions when rewinding in time or going forward.
          */
         public Action prepareInputDelegate;
         
+        //Callbacks
         public static Action simulateDelegate;
         public static Action saveDelegate;
         public static Action saveInputDelegate;
@@ -73,6 +74,9 @@ namespace Packages.EZRollback.Runtime.Scripts {
         void OnEnable() {
             rbInputManager = GetComponent<RollbackInputManager>();
 
+            if (rbInputManager == null)
+                return;
+            
             //Register the inputs callbacks
             prepareInputDelegate += rbInputManager.UpdateInputStatus;
             saveInputDelegate += rbInputManager.SaveFrame;
@@ -80,6 +84,9 @@ namespace Packages.EZRollback.Runtime.Scripts {
             deleteFramesInputDelegate += rbInputManager.DeleteFrames;
         }
         void OnDisable() {
+            if (rbInputManager == null)
+                return;
+            
             //Unregister the inputs callbacks
             prepareInputDelegate -= rbInputManager.UpdateInputStatus;
             saveInputDelegate -= rbInputManager.SaveFrame;
@@ -147,9 +154,9 @@ namespace Packages.EZRollback.Runtime.Scripts {
                 return;
             
             //Apply set
-            deleteFramesDelegate.Invoke(_maxFrameNum - _displayedFrameNum, DeleteFrameMode.LAST_FRAMES);
+            deleteFramesDelegate?.Invoke(_maxFrameNum - _displayedFrameNum, DeleteFrameMode.LAST_FRAMES);
             if (deleteInputs) {
-                deleteFramesInputDelegate.Invoke(_maxFrameNum - _displayedFrameNum, DeleteFrameMode.LAST_FRAMES);
+                deleteFramesInputDelegate?.Invoke(_maxFrameNum - _displayedFrameNum, DeleteFrameMode.LAST_FRAMES);
             }
                 
             _maxFrameNum = _displayedFrameNum;
@@ -176,8 +183,8 @@ namespace Packages.EZRollback.Runtime.Scripts {
                 return;
 
             //Apply Goto
-            goToFrameInputDelegate.Invoke(frameNumber);
-            goToFrameDelegate.Invoke(frameNumber);
+            goToFrameInputDelegate?.Invoke(frameNumber);
+            goToFrameDelegate?.Invoke(frameNumber);
 
             _displayedFrameNum = frameNumber;
             if (deleteFrames) {
@@ -195,9 +202,9 @@ namespace Packages.EZRollback.Runtime.Scripts {
             SetCurrentFrameAsLastRegistered(inputsToo);
 
             //Apply save
-            saveDelegate.Invoke();
+            saveDelegate?.Invoke();
             if (inputsToo) {
-                saveInputDelegate.Invoke();
+                saveInputDelegate?.Invoke();
             }
             
             _displayedFrameNum++;
@@ -216,11 +223,11 @@ namespace Packages.EZRollback.Runtime.Scripts {
             for (int i = 0; i < numFrames; i++) {
                 //Apply simulate and save for each frames
                 if (inputsToo){
-                    prepareInputDelegate.Invoke();
+                    prepareInputDelegate?.Invoke();
                 } else {
-                    goToFrameInputDelegate.Invoke(_displayedFrameNum + 1);
+                    goToFrameInputDelegate?.Invoke(_displayedFrameNum + 1);
                 }
-                simulateDelegate.Invoke();
+                simulateDelegate?.Invoke();
                 SaveCurrentFrame(inputsToo);
             }
         }
@@ -239,8 +246,8 @@ namespace Packages.EZRollback.Runtime.Scripts {
          */
         private void ManageBufferSize() {
             if (_bufferSize > 0 && _maxFrameNum > _bufferSize) {
-                deleteFramesDelegate.Invoke(1, DeleteFrameMode.FIT_TO_BUFFER);
-                deleteFramesInputDelegate.Invoke(1, DeleteFrameMode.FIT_TO_BUFFER);
+                deleteFramesDelegate?.Invoke(1, DeleteFrameMode.FIT_TO_BUFFER);
+                deleteFramesInputDelegate?.Invoke(1, DeleteFrameMode.FIT_TO_BUFFER);
 
                 _maxFrameNum = _bufferSize;
                 _displayedFrameNum = _maxFrameNum;

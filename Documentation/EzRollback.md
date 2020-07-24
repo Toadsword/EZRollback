@@ -1,61 +1,35 @@
 
 
-# EZRollback Documentation 
+<header>
+EZRollback Documentation
+============
+</header>
 
-## Introduction
+# Introduction
 
 This documentation will explain how to use the framework. Before being able to use the rollback in your game engine, the framework will need to know what information need to be stored to perform a rollback and what needs to be executed when simulating frames.
 
-The goal of the framework is to enable the possibility to implement a rollback system in your Unity game. The uses are multiple :
-- Debug purpose to have informations for each frames
-- Implement an online game using rollback
-- Have a replay system in your game
+# Design goals
+The design goal of the framework is to enable the possibility to implement a rollback system in your Unity game. The uses are multiple :
+- **Debug purpose :** Gather precise informations each frames visually.
+- **Netcode :** Implement an online game using rollback.
+- **Replay system** :  Record frames and play it backward and forward.
 
 ![Gif showing the use of a rollback system in a simple game](./img/RollbackIntroduction.gif)
 
-## Glossary
+# Integration
 
-**Rollback** : Going back in time in the state of the game
+To add rollback into your game, you will need to adapt your scripts for the rollback to work properly.
+Main things to change :
 
-**Simulate frames** : Going forward in time. Works like fixed update... But we do it a certain number of time at once.
-
-**Fixed frame** : A frame recorded with the fixed time step of Unity (default : every 0.02Sec)
-
-## Important scripts
-
-### Abstract classes
-To implement the rollback in your game, you will mainly inherite those classes to your scripts :
-
-**RollbackBehaviour** : Abstract class, inheriting from Monobehaviour, that implements all the required functions from the rollbackmanager callbacks.
-
-**RollbackInputManager** : Complement abstract manager that stores player's inputs and rollback them. Is necessary to use rollback in your game for inputs(for networking for example). Have extra functions that allow input correction for players.
-
-### Other scripts
-
-**RollbackManager** : The main manager that deals with all the rollback mechanism. Make callbacks at the right time and manage the global status of the frames and the game.
-
-**RollbackElement< T >** : Data structures conveniently designed to store all the information the rollback system need about your variable. Use preferably with a struct to optimize its use.
-
-**RollbackInputBaseActions** : Base data structure used to store the input data. Optimised to use the minimum required space for network transfere.
-
-## Example scripts
-
-For **RollbackBehaviour** : 
-
-- PositionRollback.cs 
-- RotationRollback.cs
-
-Implements rollback for the position and the rotation of the linked GameObject.
-
-For **RollbackInputManager** : 
-- SampleRollbackInputManager
-
-Implementing the basic Unity input system to the needs of the rollback system. 
-Can be found in Tests/Runtime/InputDelayComparer.
+ - Determine what data need to be rollbacked and compact them into structs,
+ - Make your **Monobehaviour** scripts inherit from **RollbackBehaviour** instead,
+	 - Implement in the Simulate() function what needs to be evaluated each frames.
+ - If needed, implement your input system with **RollbackInputManager**.
 
 ## Transitionning your scripts
 
-### **Monobehaviour** with **RollbackBehaviour**
+### Monobehaviour with RollbackBehaviour
 
 Basically, you will need to implement what the rollback needs to do on your scripts. For every scripts that changes important values every frames, you will need to replace :
 - Implement the abstract functions from RollbackBehaviour
@@ -99,6 +73,23 @@ public override void Simulate() {
 			- I recommend implementing this one, for debug purposes.
 	- Change all input uses in your game with the one from the new manager.
 	
+
+## Example scripts
+
+For **RollbackBehaviour** : 
+
+- PositionRollback.cs 
+- RotationRollback.cs
+
+Implements rollback for the position and the rotation of the linked GameObject.
+
+For **RollbackInputManager** : 
+- SampleRollbackInputManager
+
+Implementing the basic Unity input system to the needs of the rollback system. 
+Can be found in Tests/Runtime/InputDelayComparer.
+
+
 ### Transition examples : 
 Data sctruct to rollback of your class (initially used in your script)
 ```C#
@@ -164,3 +155,27 @@ Rather use Time.fixedtimestep, else your scripts won't work when simulating fram
 
 **If implementing online, be aware of time synchronization.**. Have a way to know when to start recording rollback in your game, and when to stop.
 
+## Important scripts
+
+### Abstract classes
+To implement the rollback in your game, you will mainly inherite those classes to your scripts :
+
+**RollbackBehaviour** : Abstract class, inheriting from Monobehaviour, that implements all the required functions from the rollbackmanager callbacks.
+
+**RollbackInputManager** : Complement abstract manager that stores player's inputs and rollback them. Is necessary to use rollback in your game for inputs(for networking for example). Have extra functions that allow input correction for players.
+
+### Other scripts
+
+**RollbackManager** : The main manager that deals with all the rollback mechanism. Make callbacks at the right time and manage the global status of the frames and the game.
+
+**RollbackElement< T >** : Data structures conveniently designed to store all the information the rollback system need about your variable. Use preferably with a struct to optimize its use.
+
+**RollbackInputBaseActions** : Base data structure used to store the input data. Optimised to use the minimum required space for network transfere.
+
+# Glossary
+
+**Rollback** : Going back in time in the state of the game
+
+**Simulate frames** : Going forward in time. Works like fixed update... But we do it a certain number of time at once.
+
+**Fixed frame** : A frame recorded with the fixed time step of Unity (default : every 0.02Sec)
