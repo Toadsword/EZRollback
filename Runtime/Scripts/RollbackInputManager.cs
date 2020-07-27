@@ -160,7 +160,7 @@ public abstract class RollbackInputManager : MonoBehaviour
      * \param rbInputBaseActions Array of actions that will replace the current ones
      */
     public void CorrectInputs(int playerId, int numFrames, RollbackInputBaseActions[] rbInputBaseActions) {
-        int currentFrame = RollbackManager._instance.GetDisplayedFrameNum();
+        int currentFrame = RollbackManager.Instance.GetDisplayedFrameNum();
         for (int i = 0; i < numFrames; i++) {
             _playerInputList[playerId].CorrectValue(rbInputBaseActions[i],currentFrame - numFrames + i);
         }
@@ -172,8 +172,8 @@ public abstract class RollbackInputManager : MonoBehaviour
      * \return Corrected value
      */
     private int CheckFrameNumber(int frameNumber) {
-        if (frameNumber < 0 || frameNumber > RollbackManager._instance.GetDisplayedFrameNum()) {
-            frameNumber = RollbackManager._instance.GetDisplayedFrameNum();
+        if (frameNumber < 0 || frameNumber > RollbackManager.Instance.GetDisplayedFrameNum()) {
+            frameNumber = RollbackManager.Instance.GetDisplayedFrameNum();
         }
 
         return frameNumber;

@@ -50,9 +50,11 @@ namespace Packages.EZRollback.Editor {
 
                 GUIUtils.GuiLine(3);
                 DisplaySimulateOptions();
-            
-                GUIUtils.GuiLine(3);
-                DisplayInputSimulation();
+
+                if (_rollbackManager.GetRBInputManager() != null) {
+                    GUIUtils.GuiLine(3);
+                    DisplayInputSimulation();
+                }
             }
             EditorGUILayout.EndScrollView();
         }
@@ -63,13 +65,7 @@ namespace Packages.EZRollback.Editor {
         private void LogPlayModeState(PlayModeStateChange playModeStateChange) {
             switch (playModeStateChange) {
                 case PlayModeStateChange.EnteredPlayMode:
-                    
-                    //Find or create a RollbackManager
-                    _rollbackManager = GameObject.FindObjectOfType<RollbackManager>();
-                    if (_rollbackManager == null) {
-                        _rollbackManager = Instantiate(Resources.Load("RollbackManagerPrefab") as GameObject, Vector3.zero, Quaternion.identity).GetComponent<RollbackManager>();
-                    }
-                    
+                    _rollbackManager = RollbackManager.Instance;
                     _rbBaseInput = new RollbackInputBaseActions(1 + _numOfInputs / 8);
                     break;
             }

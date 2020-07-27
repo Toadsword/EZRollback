@@ -106,7 +106,7 @@ public class RollbackElement<T> {
     public void DeleteFrames(int numFramesToDelete, RollbackManager.DeleteFrameMode deleteMode) {
 
         if (deleteMode == RollbackManager.DeleteFrameMode.FIT_TO_BUFFER) {
-            if (_size >= RollbackManager._instance.GetBufferSize()) {
+            if (_size >= RollbackManager.Instance.GetBufferSize()) {
                 deleteMode = RollbackManager.DeleteFrameMode.FIRST_FRAMES;
             } else {
                 return;
