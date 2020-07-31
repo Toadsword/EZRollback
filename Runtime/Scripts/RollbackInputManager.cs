@@ -35,7 +35,7 @@ public abstract class RollbackInputManager : MonoBehaviour
      */
     public virtual int AddPlayer() {
         _playerInputList.Add(new RollbackElementRollbackInputBaseActions());
-        return _playerInputList.Count;
+        return _playerInputList.Count - 1;
     }
     
     /**

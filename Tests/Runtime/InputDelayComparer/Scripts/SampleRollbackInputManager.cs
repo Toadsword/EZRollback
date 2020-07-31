@@ -11,13 +11,14 @@ public class SampleRollbackInputManager : RollbackInputManager
         DOWN,
         LEFT,
         
-        SHOOT
+        SHOOT,
+        
+        LENGTH
     }
     
-    
-    protected  override RollbackInputBaseActions GetCurrentActionsValue(int controllerId){
-        
-        RollbackInputBaseActions actionsValue = new RollbackInputBaseActions(5);
+    protected  override RollbackInputBaseActions GetCurrentActionsValue(int controllerId) {
+        //Gather local inputs and execute them
+        RollbackInputBaseActions actionsValue = new RollbackInputBaseActions((int)ActionsCode.LENGTH);
         
         SetBitFromKeycode((int)ActionsCode.UP, KeyCode.W, ref actionsValue);
         SetBitFromKeycode((int)ActionsCode.RIGHT, KeyCode.D, ref actionsValue);
