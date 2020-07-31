@@ -21,11 +21,12 @@ namespace Packages.EZRollback.Runtime.Scripts {
 
     [SerializeField] bool _displayDebugOnScreen = false;
     public bool doRollback = false;
+    public bool registerFrames = false;
     public bool bufferRestriction = false;
     
     /** ----------------- STATICS -------------------- **/
     /**
-     * Delegate?s are created to make a callback to all registered functions when rewinding in time or going forward.
+     * Delegates are created to make a callback to all registered functions when rewinding in time or going forward.
      */
     public Action prepareInputDelegate;
     
@@ -127,9 +128,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
         if(deleteFramesDelegate == null)
             return;
         
-        if (doRollback) {
-            GoBackInFrames(1);
-        } else {
+        if(registerFrames) {
             Simulate(1);
             if (bufferRestriction) {
                 ManageBufferSize();

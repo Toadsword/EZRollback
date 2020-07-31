@@ -5,14 +5,25 @@ namespace Packages.EZRollback.Tests.Runtime.InputDelayComparer.Scripts {
 
 public class SampleRollbackInputManager : RollbackInputManager
 {
+    public enum ActionsCode : int{
+        UP = 0,
+        RIGHT,
+        DOWN,
+        LEFT,
+        
+        SHOOT
+    }
+    
+    
     protected  override RollbackInputBaseActions GetCurrentActionsValue(int controllerId){
         
         RollbackInputBaseActions actionsValue = new RollbackInputBaseActions(5);
         
-        SetBitFromAction(0, KeyCode.W, ref actionsValue);
-        SetBitFromAction(1, KeyCode.D, ref actionsValue);
-        SetBitFromAction(2, KeyCode.S, ref actionsValue);
-        SetBitFromAction(3, KeyCode.A, ref actionsValue);
+        SetBitFromKeycode((int)ActionsCode.UP, KeyCode.W, ref actionsValue);
+        SetBitFromKeycode((int)ActionsCode.RIGHT, KeyCode.D, ref actionsValue);
+        SetBitFromKeycode((int)ActionsCode.DOWN, KeyCode.S, ref actionsValue);
+        SetBitFromKeycode((int)ActionsCode.LEFT, KeyCode.A, ref actionsValue);
+        actionsValue.SetOrClearBit((int)ActionsCode.SHOOT, Input.GetMouseButton(1));
 
         actionsValue.SetHorizontalAxis(Input.GetAxisRaw("Horizontal"));
         actionsValue.SetVerticalAxis(Input.GetAxisRaw("Vertical"));
@@ -20,7 +31,12 @@ public class SampleRollbackInputManager : RollbackInputManager
         return actionsValue;
     }
 
-    void SetBitFromAction(int inputIndex, KeyCode keyCode, ref RollbackInputBaseActions actionsValue) {
+    public override int AddPlayer() {
+        Debug.Log("AddPlayer");
+        return base.AddPlayer();
+    }
+
+    void SetBitFromKeycode(int inputIndex, KeyCode keyCode, ref RollbackInputBaseActions actionsValue) {
         actionsValue.SetOrClearBit(inputIndex, Input.GetKey(keyCode));
     }
 
@@ -30,6 +46,7 @@ public class SampleRollbackInputManager : RollbackInputManager
             case 1 : return "Right";
             case 2 : return "Down";
             case 3 : return "Left";
+            case 4 : return "Left mouse button";
         }
 
         return "out";
