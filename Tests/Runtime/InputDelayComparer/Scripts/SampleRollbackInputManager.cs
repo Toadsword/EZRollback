@@ -16,6 +16,10 @@ public class SampleRollbackInputManager : RollbackInputManager
         LENGTH
     }
     
+    protected override int GetNumberOfInputs() {
+        return (int) ActionsCode.LENGTH;
+    }
+    
     protected  override RollbackInputBaseActions GetCurrentActionsValue(int controllerId) {
         //Gather local inputs and execute them
         RollbackInputBaseActions actionsValue = new RollbackInputBaseActions((int)ActionsCode.LENGTH);

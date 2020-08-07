@@ -10,18 +10,18 @@ public struct RollbackInputBaseActions {
 
     const float AxisChangeRatio = 64.0f;
     
-    [SerializeField] private sbyte horizontalValue;
-    [SerializeField] private sbyte verticalValue;
-    [SerializeField] private byte[] bits;
+    [SerializeField] private sbyte _horizontalValue;
+    [SerializeField] private sbyte _verticalValue;
+    [SerializeField] private byte[] _bits;
     
     /**
      * \brief Constructor of the class.
      * \param defaultSize Number of inputs the BaseActions should be able to handle.
      */
     public RollbackInputBaseActions(int defaultSize = 1) {
-        bits = new byte[1 + defaultSize/8];
-        horizontalValue = 0;
-        verticalValue = 0;
+        _bits = new byte[1 + defaultSize/8];
+        _horizontalValue = 0;
+        _verticalValue = 0;
     }
 
     /**
@@ -30,7 +30,7 @@ public struct RollbackInputBaseActions {
      * \return true if input is pressed, false otherwise.
      */
     public bool GetValueBit(int i) {
-        return (bits[i/8] & (1 << (i%8))) != 0;
+        return (_bits[i/8] & (1 << (i%8))) != 0;
     }
 
     /**
@@ -50,7 +50,7 @@ public struct RollbackInputBaseActions {
      * \param i Index of the input.
      */
     public void SetBit(int i) {
-        bits[i/8] |= (byte)(1 << (i%8));
+        _bits[i/8] |= (byte)(1 << (i%8));
     }
     
     /**
@@ -58,7 +58,7 @@ public struct RollbackInputBaseActions {
      * \param i Index of the input.
      */
     public void ClearBit(int i) {
-        bits[i/8] &= (byte)~(1 << (i%8));
+        _bits[i/8] &= (byte)~(1 << (i%8));
     }
     
     /**
@@ -66,7 +66,7 @@ public struct RollbackInputBaseActions {
      * \param value
      */
     public void SetVerticalAxis(float value) {
-        verticalValue = TransformAxisValueToSByte(value);
+        _verticalValue = TransformAxisValueToSByte(value);
     }
     
     /**
@@ -74,7 +74,7 @@ public struct RollbackInputBaseActions {
      * \return value
      */
     public float GetVerticalAxis() {
-        return TransformSByteToAxisValue(verticalValue);
+        return TransformSByteToAxisValue(_verticalValue);
     }
     
     /**
@@ -82,7 +82,7 @@ public struct RollbackInputBaseActions {
      * \param value
      */
     public void SetHorizontalAxis(float value) {
-        horizontalValue = TransformAxisValueToSByte(value);
+        _horizontalValue = TransformAxisValueToSByte(value);
     }
     
     /**
@@ -90,7 +90,7 @@ public struct RollbackInputBaseActions {
      * \return value
      */
     public float GetHorizontalAxis() {
-        return TransformSByteToAxisValue(horizontalValue);
+        return TransformSByteToAxisValue(_horizontalValue);
     }
 
     /**

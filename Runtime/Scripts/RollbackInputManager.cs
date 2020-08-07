@@ -16,6 +16,8 @@ public class RollbackElementRollbackInputBaseActions : RollbackElement<RollbackI
  */
 public abstract class RollbackInputManager : MonoBehaviour {
     public int localPlayerId;
+
+    private int _defaultNumberOfInputs = 1;
     
     public enum AxisEnum {
         HORIZONTAL,
@@ -28,7 +30,11 @@ public abstract class RollbackInputManager : MonoBehaviour {
         if (_playerInputList == null) {
             _playerInputList = new List<RollbackElementRollbackInputBaseActions>();
         }
+
+        _defaultNumberOfInputs = GetNumberOfInputs();
     }
+
+    protected abstract int GetNumberOfInputs();
 
     /**
      * \brief Add a player to the list of inputs.
@@ -36,6 +42,7 @@ public abstract class RollbackInputManager : MonoBehaviour {
      */
     public virtual int AddPlayer() {
         _playerInputList.Add(new RollbackElementRollbackInputBaseActions());
+        _playerInputList[_playerInputList.Count - 1].value = new RollbackInputBaseActions(5);
         return _playerInputList.Count - 1;
     }
     
@@ -105,6 +112,9 @@ public abstract class RollbackInputManager : MonoBehaviour {
      * \return Value of the action, true if pressed, false otherwise
      */
     public virtual bool GetInput(int actionValue, int playerId, int frameNumber = -1) {
+        if (playerId >= _playerInputList.Count)
+            return false;
+        
         frameNumber = CheckFrameNumber(frameNumber);
         return _playerInputList[playerId].GetValue(frameNumber).GetValueBit(actionValue);
     }
@@ -118,9 +128,14 @@ public abstract class RollbackInputManager : MonoBehaviour {
      * \return Value of the action, true if pressed at requested frame, false otherwise
      */
     public virtual bool GetInputDown(int actionValue, int playerId, int frameNumber = -1) {
+        if (playerId >= _playerInputList.Count)
+            return false;
+        
         frameNumber = CheckFrameNumber(frameNumber);
-        return !_playerInputList[playerId].GetValue(frameNumber - 1).GetValueBit(actionValue) && 
-               _playerInputList[playerId].value.GetValueBit(actionValue);
+        
+        bool frameBeforeValue = _playerInputList[playerId].GetValue(frameNumber - 1).GetValueBit(actionValue);
+        bool currentFrameValue = _playerInputList[playerId].value.GetValueBit(actionValue);
+        return !frameBeforeValue && currentFrameValue;
     }
     
     /**
@@ -132,6 +147,9 @@ public abstract class RollbackInputManager : MonoBehaviour {
      * \return Value of the action, true if released at requested frame, false otherwise
      */
     public virtual bool GetInputUp(int actionValue, int playerId, int frameNumber = -1) {
+        if (playerId >= _playerInputList.Count)
+            return false;
+        
         frameNumber = CheckFrameNumber(frameNumber);
         return _playerInputList[playerId].GetValue(frameNumber - 1).GetValueBit(actionValue) && 
                !_playerInputList[playerId].GetValue(frameNumber).GetValueBit(actionValue);
