@@ -67,8 +67,13 @@ public class RollbackElement<T> {
      * \param correctedValue New value
      * \param frameNum Frame number to correct 
      */
-    public void CorrectValue(T correctedValue, int frameNum) {
-        _history[GetCorrectFrameNumber(frameNum)] = correctedValue;
+    public bool CorrectValue(T correctedValue, int frameNum) {
+        if (!_history[GetCorrectFrameNumber(frameNum)].Equals(correctedValue)) {
+            _history[GetCorrectFrameNumber(frameNum)] = correctedValue;
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -88,7 +93,7 @@ public class RollbackElement<T> {
      */
     public void SetValueFromFrameNumber(int frameNum) {
         if (1 > frameNum) {
-            Debug.LogWarning("Cannot go back from higher number of registered frames. Returning last");
+            //Debug.LogWarning("Cannot go back from higher number of registered frames. Returning last");
             frameNum = 1;
         }
 

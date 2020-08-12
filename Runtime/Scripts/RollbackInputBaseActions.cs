@@ -1,4 +1,5 @@
 ﻿using System;
+using Packages.EZRollback.Runtime.Scripts;
 using UnityEngine;
 
 /**
@@ -6,14 +7,14 @@ using UnityEngine;
  * It includes two axis : Horizontal and Vertical.
  */
 [Serializable]
-public struct RollbackInputBaseActions {
+public struct RollbackInputBaseActions : IEquatable<RollbackInputBaseActions> {
 
     const float AxisChangeRatio = 64.0f;
-    
+
     [SerializeField] private sbyte _horizontalValue;
     [SerializeField] private sbyte _verticalValue;
     [SerializeField] private byte[] _bits;
-    
+
     /**
      * \brief Constructor of the class.
      * \param defaultSize Number of inputs the BaseActions should be able to handle.
@@ -108,5 +109,68 @@ public struct RollbackInputBaseActions {
      */
     private float TransformSByteToAxisValue(sbyte value) {
         return value / AxisChangeRatio;
+    }
+
+    public byte[] PackBits() {
+        byte[] bytes = new byte[2 + _bits.Length];
+
+        bytes[0] = (byte)_horizontalValue;
+        bytes[1] = (byte)_verticalValue;
+        
+        for(int i = 0; i < _bits.Length; i++) {
+            bytes[2 + i] = _bits[i];
+        }
+
+        return bytes;
+    }
+
+    public void UnpackBits(byte[] bytes) {
+        _horizontalValue = (sbyte)bytes[0];
+        _verticalValue = (sbyte)bytes[1];
+        
+        _bits = new byte[bytes.Length - 2];
+        for(int i = 0; i < bytes.Length - 2; i++) {
+            _bits[i] = bytes[2 + i];
+        }
+    }
+
+    public override string ToString() {
+        return "Horizontal : " + TransformSByteToAxisValue(_horizontalValue)
+                               + "; Vertical : " + TransformSByteToAxisValue(_verticalValue)
+                               + "; Bits value  : " + _bits;
+    }
+    
+    public bool IsWellInitialized() {
+        return _bits != null;
+    }
+
+    public override bool Equals(object obj) {
+        return obj is RollbackInputBaseActions other && Equals(other);
+    }
+    
+    public bool Equals(RollbackInputBaseActions other) {
+        return _horizontalValue == other._horizontalValue && 
+               _verticalValue == other._verticalValue && 
+               BitsEquals(other._bits);
+    }
+
+    //Had to implement our own way to compare an array of byte, because the Equal always returns false.
+    private bool BitsEquals(byte[] other) {
+        if (_bits.Length != other.Length) return false;
+
+        bool result = true;
+        for (int i = 0; i < _bits.Length; i++) {
+            result = _bits[i] == other[i];
+        }
+        return result;
+    }
+
+    public override int GetHashCode() {
+        unchecked {
+            int hashCode = _horizontalValue.GetHashCode();
+            hashCode = (hashCode * 397) ^ _verticalValue.GetHashCode();
+            hashCode = (hashCode * 397) ^ (_bits != null ? _bits.GetHashCode() : 0);
+            return hashCode;
+        }
     }
 }

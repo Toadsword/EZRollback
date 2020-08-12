@@ -36,13 +36,21 @@ public abstract class RollbackInputManager : MonoBehaviour {
 
     protected abstract int GetNumberOfInputs();
 
+    public int GetNumberOfBitsNeeded() {
+        return 2 + (_defaultNumberOfInputs / 8);
+    }
+
+    public RollbackElementRollbackInputBaseActions GetPlayerInputHistory(int playerId) {
+        return _playerInputList[playerId];
+    } 
+    
     /**
      * \brief Add a player to the list of inputs.
      * \return The number of current players in the list.
      */
     public virtual int AddPlayer() {
         _playerInputList.Add(new RollbackElementRollbackInputBaseActions());
-        _playerInputList[_playerInputList.Count - 1].value = new RollbackInputBaseActions(5);
+        _playerInputList[_playerInputList.Count - 1].value = new RollbackInputBaseActions(_defaultNumberOfInputs);
         return _playerInputList.Count - 1;
     }
     
@@ -177,12 +185,17 @@ public abstract class RollbackInputManager : MonoBehaviour {
      * \param playerId ID of the player
      * \param numFrames Number of frames to correct from the currentFrame
      * \param rbInputBaseActions Array of actions that will replace the current ones
+     * \return true if corrected, false otherwise
      */
-    public void CorrectInputs(int playerId, int numFrames, RollbackInputBaseActions[] rbInputBaseActions) {
+    public bool CorrectInputs(int playerId, int numFrames, RollbackInputBaseActions[] rbInputBaseActions) {
         int currentFrame = RollbackManager.Instance.GetDisplayedFrameNum();
+        bool result = true;
         for (int i = 0; i < numFrames; i++) {
-            _playerInputList[playerId].CorrectValue(rbInputBaseActions[i],currentFrame - numFrames + i);
+            result = _playerInputList[playerId].CorrectValue(rbInputBaseActions[i],currentFrame - numFrames + i);
+            if (!result) break;
         }
+
+        return result;
     }
     
     /**
@@ -212,6 +225,7 @@ public abstract class RollbackInputManager : MonoBehaviour {
      * \brief Save the inputs of all the players of the current frames.
      */
     public void SetValueFromFrameNumber(int frameNumber) {
+        frameNumber = CheckFrameNumber(frameNumber);
         for (int i = 0; i < _playerInputList.Count; i++) {
             _playerInputList[i].SetValueFromFrameNumber(frameNumber);
         }

@@ -15,11 +15,6 @@ namespace Packages.EZRollback.Runtime.Scripts {
         FIT_TO_BUFFER
     }
     
-    /**
-     * \brief _instance is a static variable, allowing any component to access it when needed without the need of a reference
-     */
-
-    [SerializeField] bool _displayDebugOnScreen = false;
     public bool doRollback = false;
     public bool registerFrames = false;
     public bool bufferRestriction = false;
