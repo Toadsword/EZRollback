@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+namespace Packages.EZRollback.Tests.SceneTests.InputDelayComparer.Scripts {
 public class RotationComparer : MonoBehaviour {
 
     [SerializeField] Transform _transform1;
@@ -33,4 +31,5 @@ public class RotationComparer : MonoBehaviour {
             }
         }
     }
+}
 }

@@ -242,5 +242,8 @@ public abstract class RollbackInputManager : MonoBehaviour {
         }
     }
 
+    public void ClearInputManager() {
+        _playerInputList = new List<RollbackElementRollbackInputBaseActions>();
+    }
 }
 }

@@ -17,11 +17,11 @@ public abstract class RollbackBehaviour : MonoBehaviour {
     
     
     public void Awake() {
-     RollbackManager.RegisterRollbackBehaviour(this);
+      RollbackManager.RegisterRollbackBehaviour(this);
     }
 
     public void OnDestroy() {
-     RollbackManager.RegisterRollbackBehaviour(this);
+      RollbackManager.RegisterRollbackBehaviour(this);
     }
     /*
     public void OnEnable() {

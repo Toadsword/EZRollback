@@ -39,18 +39,14 @@ public class RollbackElement<T> {
      * \param frameNum Number of the frame requested
      */
     public T GetValue(int frameNum) {
-        if (frameNum == _size || frameNum == 0) {
-            return value;
-        }
-        
-        if (frameNum < _size) {
+        if (frameNum < _size && frameNum > 0) {
             if (frameNum < 0) {
                 frameNum = _size - 1;
             }
             return _history[GetCorrectFrameNumber(frameNum)];
         }
 
-        return default;
+        return value;
     }
 
     /**
@@ -68,9 +64,11 @@ public class RollbackElement<T> {
      * \param frameNum Frame number to correct 
      */
     public bool CorrectValue(T correctedValue, int frameNum) {
-        if (!_history[GetCorrectFrameNumber(frameNum)].Equals(correctedValue)) {
-            _history[GetCorrectFrameNumber(frameNum)] = correctedValue;
-            return true;
+        if (frameNum < _size && frameNum > 0) {
+            if (!_history[GetCorrectFrameNumber(frameNum)].Equals(correctedValue)) {
+                _history[GetCorrectFrameNumber(frameNum)] = correctedValue;
+                return true;
+            }
         }
 
         return false;
@@ -112,7 +110,7 @@ public class RollbackElement<T> {
     public void DeleteFrames(int numFramesToDelete, RollbackManager.DeleteFrameMode deleteMode) {
 
         if (deleteMode == RollbackManager.DeleteFrameMode.FIT_TO_BUFFER) {
-            if (_size >= RollbackManager.Instance.GetBufferSize()) {
+            if (_size >= RollbackManager.Instance.bufferSize) {
                 deleteMode = RollbackManager.DeleteFrameMode.FIRST_FRAMES;
             } else {
                 return;

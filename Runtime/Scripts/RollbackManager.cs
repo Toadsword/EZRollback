@@ -15,7 +15,6 @@ namespace Packages.EZRollback.Runtime.Scripts {
         FIT_TO_BUFFER
     }
     
-    public bool doRollback = false;
     public bool registerFrames = false;
     public bool bufferRestriction = false;
     
@@ -39,17 +38,13 @@ namespace Packages.EZRollback.Runtime.Scripts {
     [SerializeField] int _maxFrameNum = 0;
     [SerializeField] int _displayedFrameNum = 0;
 
-    [SerializeField] int _bufferSize = -1;
+    [SerializeField] public int bufferSize = -1;
 
     /* ----- Getter and Setters ------ */
     public RollbackInputManager GetRBInputManager() {
         return rbInputManager;
     }
 
-    public int GetBufferSize() {
-        return _bufferSize;
-    }
-    
     public int GetDisplayedFrameNum() {
         return _displayedFrameNum;
     }
@@ -60,26 +55,33 @@ namespace Packages.EZRollback.Runtime.Scripts {
 
     RollbackBehaviour[] _rbRegisteredBehaviours;
     void OnEnable() {
-        rbInputManager = GetComponent<RollbackInputManager>();
+        ResetRbInputManagerEvents(false);
+    }
+    void OnDisable() {
+        //Unregister the inputs callbacks
+        ResetRbInputManagerEvents(true);    
+    }
 
+    public void ResetRbInputManagerEvents(bool onlyUnset = false) {
+        if (rbInputManager != null) {
+            prepareInputDelegate -= rbInputManager.UpdateInputStatus;
+            saveInputDelegate -= rbInputManager.SaveFrame;
+            goToFrameInputDelegate -= rbInputManager.SetValueFromFrameNumber;
+            deleteFramesInputDelegate -= rbInputManager.DeleteFrames;
+            rbInputManager = null;
+        }
+
+        if (onlyUnset) 
+            return;
+        
+        rbInputManager = GetComponent<RollbackInputManager>();
         if (rbInputManager == null)
             return;
         
-        //Register the inputs callbacks
         prepareInputDelegate += rbInputManager.UpdateInputStatus;
         saveInputDelegate += rbInputManager.SaveFrame;
         goToFrameInputDelegate += rbInputManager.SetValueFromFrameNumber;
         deleteFramesInputDelegate += rbInputManager.DeleteFrames;
-    }
-    void OnDisable() {
-        if (rbInputManager == null)
-            return;
-        
-        //Unregister the inputs callbacks
-        prepareInputDelegate -= rbInputManager.UpdateInputStatus;
-        saveInputDelegate -= rbInputManager.SaveFrame;
-        goToFrameInputDelegate -= rbInputManager.SetValueFromFrameNumber;
-        deleteFramesInputDelegate -= rbInputManager.DeleteFrames;
     }
 
     /**
@@ -125,10 +127,14 @@ namespace Packages.EZRollback.Runtime.Scripts {
         
         if(registerFrames) {
             Simulate(1);
-            if (bufferRestriction) {
-                ManageBufferSize();
-            }
         }
+    }
+
+    public void ClearRollbackManager() {
+        deleteFramesDelegate?.Invoke(GetMaxFramesNum(), DeleteFrameMode.FIRST_FRAMES);
+        deleteFramesInputDelegate?.Invoke(GetMaxFramesNum(), DeleteFrameMode.FIRST_FRAMES);
+        
+        rbInputManager.ClearInputManager();
     }
 
     /**
@@ -195,6 +201,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
         
         _displayedFrameNum++;
         _maxFrameNum = _displayedFrameNum;
+        
     }
 
     /**
@@ -215,6 +222,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
             simulateDelegate?.Invoke();
             SaveCurrentFrame(inputsToo);
         }
+        
+        if (bufferRestriction && inputsToo) {
+            ManageBufferSize();           
+        }
     }
     
     /**
@@ -230,11 +241,11 @@ namespace Packages.EZRollback.Runtime.Scripts {
      * \brief Resize the frame buffer if it exceeds its size
      */
     private void ManageBufferSize() {
-        if (_bufferSize > 0 && _maxFrameNum > _bufferSize) {
+        if (bufferSize > 0 && _maxFrameNum > bufferSize) {
             deleteFramesDelegate?.Invoke(1, DeleteFrameMode.FIT_TO_BUFFER);
             deleteFramesInputDelegate?.Invoke(1, DeleteFrameMode.FIT_TO_BUFFER);
 
-            _maxFrameNum = _bufferSize;
+            _maxFrameNum = bufferSize;
             _displayedFrameNum = _maxFrameNum;
         }
     }
