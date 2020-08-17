@@ -238,6 +238,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
      * \param numFrames Number of frames to resimulate
      */
     public void ReSimulate(int numFrames) {
+        if (numFrames >= _maxFrameNum) {
+            numFrames = _maxFrameNum - 1;
+        }
+        
         GoBackInFrames(numFrames, true, false);
         Simulate(numFrames, false);
     }

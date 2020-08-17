@@ -140,9 +140,10 @@ public abstract class RollbackInputManager : MonoBehaviour {
             return false;
         
         frameNumber = CheckFrameNumber(frameNumber);
-        
-        bool frameBeforeValue = _playerInputList[playerId].GetValue(frameNumber - 1).GetValueBit(actionValue);
-        bool currentFrameValue = _playerInputList[playerId].value.GetValueBit(actionValue);
+
+        bool frameBeforeValue = _playerInputList[playerId].GetValue(frameNumber - 1).GetValueBit(actionValue); // GetInput(actionValue, playerId, frameNumber - 1);
+        bool currentFrameValue = _playerInputList[playerId].GetValue(frameNumber).GetValueBit(actionValue); //GetInput(actionValue, playerId, frameNumber);
+
         return !frameBeforeValue && currentFrameValue;
     }
     
@@ -216,8 +217,8 @@ public abstract class RollbackInputManager : MonoBehaviour {
      * \brief Save the inputs of all the players of the current frames.
      */
     public void SaveFrame() {
-        for (int i = 0; i < _playerInputList.Count; i++) {
-            _playerInputList[i].SaveFrame();
+        foreach (RollbackElementRollbackInputBaseActions element in _playerInputList) {
+            element.SaveFrame();
         }
     }
     
@@ -226,8 +227,8 @@ public abstract class RollbackInputManager : MonoBehaviour {
      */
     public void SetValueFromFrameNumber(int frameNumber) {
         frameNumber = CheckFrameNumber(frameNumber);
-        for (int i = 0; i < _playerInputList.Count; i++) {
-            _playerInputList[i].SetValueFromFrameNumber(frameNumber);
+        foreach (RollbackElementRollbackInputBaseActions element in _playerInputList) {
+            element.SetValueFromFrameNumber(frameNumber);
         }
     }
     
@@ -237,8 +238,8 @@ public abstract class RollbackInputManager : MonoBehaviour {
      * \param bool True to delete the x first frames, False to delete the x last frames registered
      */
     public void DeleteFrames(int numFramesToDelete, RollbackManager.DeleteFrameMode deleteMode) {
-        for (int i = 0; i < _playerInputList.Count; i++) {
-            _playerInputList[i].DeleteFrames(numFramesToDelete, deleteMode);
+        foreach (RollbackElementRollbackInputBaseActions element in _playerInputList) {
+            element.DeleteFrames(numFramesToDelete, deleteMode);
         }
     }
 

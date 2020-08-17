@@ -156,7 +156,7 @@ public struct RollbackInputBaseActions : IEquatable<RollbackInputBaseActions> {
 
     //Had to implement our own way to compare an array of byte, because the Equal always returns false.
     private bool BitsEquals(byte[] other) {
-        if (_bits.Length != other.Length) return false;
+            if (_bits.Length != other.Length) return false;
 
         bool result = true;
         for (int i = 0; i < _bits.Length; i++) {
