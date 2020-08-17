@@ -39,8 +39,8 @@ public class RollbackElement<T> {
      * \param frameNum Number of the frame requested
      */
     public T GetValue(int frameNum) {
-        if (frameNum < _size && frameNum > 0) {
-            if (frameNum < 0) {
+        if (frameNum <= _size && frameNum > 0) {
+            if (frameNum == _size) {
                 frameNum = _size - 1;
             }
             return _history[GetCorrectFrameNumber(frameNum)];
@@ -64,7 +64,7 @@ public class RollbackElement<T> {
      * \param frameNum Frame number to correct 
      */
     public bool CorrectValue(T correctedValue, int frameNum) {
-        if (frameNum < _size && frameNum > 0) {
+        if (frameNum <= _size && frameNum > 0) {
             if (!_history[GetCorrectFrameNumber(frameNum)].Equals(correctedValue)) {
                 _history[GetCorrectFrameNumber(frameNum)] = correctedValue;
                 return true;

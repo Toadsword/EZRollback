@@ -63,8 +63,11 @@ public class DeleteMode
         for (int i = 1; i <= 10; i++) {
             RollbackManager.Instance.Simulate(1);
             Vector3 valueToTest = Vector3.down * Time.fixedDeltaTime * i;
+            Debug.Log("1");
             Assert.True(randomObject.transform.position == valueToTest);
+            Debug.Log("2");
             Assert.True(randomObject.GetComponent<PositionRollback>().GetPositionRB().value == valueToTest);
+            Debug.Log("3");
             Assert.True(randomObject.GetComponent<PositionRollback>().GetPositionRB().GetValue(5) == valueToTest);
             yield return new WaitForSeconds(0.02f);
         }

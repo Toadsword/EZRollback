@@ -3,10 +3,9 @@ using Packages.EZRollback.Runtime.Scripts.Utils;
 using UnityEngine;
 
 namespace Packages.EZRollback.Runtime.Scripts {
-
-/**
- * \brief The RollbackManager is main rollback system present in the scene. It is required to allow your scripts to rewind in time.
- */
+    /**
+     * \brief The RollbackManager is main rollback system present in the scene. It is required to allow your scripts to rewind in time.
+     */
     public class RollbackManager : Singleton<RollbackManager> {
 
     public enum DeleteFrameMode {
@@ -37,6 +36,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
     
     [SerializeField] int _maxFrameNum = 0;
     [SerializeField] int _displayedFrameNum = 0;
+    [SerializeField] int _indexFrameNumFromStart = 0;
 
     [SerializeField] public int bufferSize = -1;
 
@@ -45,6 +45,10 @@ namespace Packages.EZRollback.Runtime.Scripts {
         return rbInputManager;
     }
 
+    public int GetIndexFrameNumFromStart() {
+        return _indexFrameNumFromStart;
+    }
+    
     public int GetDisplayedFrameNum() {
         return _displayedFrameNum;
     }
@@ -117,6 +121,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
     }
 
     void Start() {
+        _indexFrameNumFromStart = 0;
         _displayedFrameNum = 0;
         _maxFrameNum = 0;
     }
@@ -150,7 +155,7 @@ namespace Packages.EZRollback.Runtime.Scripts {
         if (deleteInputs) {
             deleteFramesInputDelegate?.Invoke(_maxFrameNum - _displayedFrameNum, DeleteFrameMode.LAST_FRAMES);
         }
-            
+        _indexFrameNumFromStart -= (_maxFrameNum - _displayedFrameNum);
         _maxFrameNum = _displayedFrameNum;
     }
 
@@ -200,8 +205,8 @@ namespace Packages.EZRollback.Runtime.Scripts {
         }
         
         _displayedFrameNum++;
+        _indexFrameNumFromStart++;
         _maxFrameNum = _displayedFrameNum;
-        
     }
 
     /**
